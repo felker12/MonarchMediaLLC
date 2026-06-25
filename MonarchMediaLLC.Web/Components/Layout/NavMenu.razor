@@ -1,0 +1,76 @@
+﻿<div class="navmenu-container @(IsSidebarCollapsed ? "sidebar-collapsed" : "")">
+
+    <div class="sidebar-header">
+
+        <div class="logo-container">
+            <img src="BgButterflyBlack.svg"
+                 alt="Company Logo"
+                 class="logo-img" />
+        </div>
+
+        <button class="btn-toggle"
+                @onclick="() => OnToggleSidebar.InvokeAsync()"
+                aria-label="Toggle Navigation">
+
+            <span class="toggle-arrow"></span>
+
+        </button>
+
+    </div>
+
+    <div class="nav-scrollable">
+
+        <nav class="nav flex-column">
+
+            <div class="nav-item">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill"></span>
+                    <span class="nav-text">Home</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link" href="counter">
+                    <span class="bi bi-plus-square-fill"></span>
+                    <span class="nav-text">Counter</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link" href="weather">
+                    <span class="bi bi-list-nested"></span>
+                    <span class="nav-text">Weather</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link" href="about">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-person-fill" viewBox="0 0 16 16">
+                        <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2m-1 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-3 4c2.623 0 4.146.826 5 1.755V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1.245C3.854 11.825 5.377 11 8 11" />
+                    </svg>
+                    <span class="nav-text">About</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link" href="projects">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-fill" viewBox="0 0 16 16">
+                        <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3m-8.322.12q.322-.119.684-.12h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981z" />
+                    </svg>
+                    <span class="nav-text">Projects</span>
+                </NavLink>
+            </div>
+
+        </nav>
+
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public bool IsSidebarCollapsed { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggleSidebar { get; set; }
+}
