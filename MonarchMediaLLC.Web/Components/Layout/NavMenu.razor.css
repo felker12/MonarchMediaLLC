@@ -7,10 +7,11 @@
 
 .logo-container {
     padding: 1rem;
-    background: rgba(230,126,34,.5);
+    /*background: #E67E2266;*/ /* 66 is 40% opacity */
+    background: color-mix( in srgb, #E67E2266, transparent 30% );
     border-radius: 50%;
-    border: 1px solid rgba(230,126,34,.5);
-    box-shadow: 0 6px 20px rgba(230,126,34,.7);
+    border: 1px solid #E67E2266; /* 66 is 40% opacity */
+    box-shadow: 0 6px 20px #E67E22B3; /* B3 is 70% opacity */
     transition: all .3s ease;
 }
 
@@ -41,12 +42,12 @@
     }
 
         .nav-item ::deep a:hover {
-            background: rgba(230,126,34,.10);
+            background: rgba(230,126,34,.20);
             color: white;
         }
 
         .nav-item ::deep a.active {
-            background: rgba(230,126,34,.18);
+            background: rgba(230,126,34,.30);
             color: white;
             border-left: 4px solid #E67E22;
         }
