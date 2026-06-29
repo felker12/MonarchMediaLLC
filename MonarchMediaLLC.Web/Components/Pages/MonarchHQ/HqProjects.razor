@@ -1,0 +1,93 @@
+﻿@page "/monarch-hq/projects"
+@using MonarchMediaLLC.Shared
+@using MonarchMediaLLC.Web.Services
+@inject HttpClient Http
+@inject AdminStateProvider AdminState
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>HQ Projects Management</PageTitle>
+
+<div class="dashboard-container">
+    @if (AdminState.IsAuthenticated)
+    {
+        <div class="dashboard-wrapper animate-fade-in">
+            <header class="dashboard-header mb-4">
+                <div>
+                    <h1>Project Management Operations</h1>
+                    <p>Deploy and initialize application portfolio cards into SQLite production storage.</p>
+                </div>
+            </header>
+
+            @if (!string.IsNullOrEmpty(statusMessage))
+            {
+                <div class="alert alert-success mb-4 text-center">@statusMessage</div>
+            }
+
+            <div class="mgmt-card max-width-md">
+                <h3>Deploy New Project Card</h3>
+                <EditForm Model="@projectModel" OnValidSubmit="SubmitProject" FormName="AddProjectForm">
+                    <div class="mb-3">
+                        <label class="form-label">Project Title</label>
+                        <input type="text" class="form-control" @bind-value="projectModel.Title" required placeholder="e.g., Southard Homes" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" @bind="projectModel.Description" required rows="3" placeholder="Brief platform summary..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tech Stack Tags</label>
+                        <input type="text" class="form-control" @bind-value="projectModel.TechStack" required placeholder="e.g., Astro • TS • Tailwind" />
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Launch URL</label>
+                        <input type="url" class="form-control" @bind-value="projectModel.Url" required placeholder="https://..." />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" disabled="@isSaving">Commit to Database</button>
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private ProjectSummary projectModel = new();
+    private string statusMessage = string.Empty;
+    private bool isSaving = false;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && !AdminState.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/monarch-hq");
+        }
+    }
+
+    private async Task SubmitProject()
+    {
+        isSaving = true;
+        statusMessage = string.Empty;
+
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, "http://apiservice/api/projects");
+            request.Headers.Add("X-Admin-Token", AdminState.Token);
+            request.Content = JsonContent.Create(projectModel);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = $"Successfully deployed project '{projectModel.Title}' into SQLite system storage.";
+                projectModel = new();
+            }
+        }
+        catch (Exception)
+        {
+            statusMessage = "Error updating backend database records.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}

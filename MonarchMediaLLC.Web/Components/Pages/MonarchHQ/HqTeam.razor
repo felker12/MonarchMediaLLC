@@ -1,0 +1,93 @@
+﻿@page "/monarch-hq/team"
+@using MonarchMediaLLC.Shared
+@using MonarchMediaLLC.Web.Services
+@inject HttpClient Http
+@inject AdminStateProvider AdminState
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>HQ Team Roster Management</PageTitle>
+
+<div class="dashboard-container">
+    @if (AdminState.IsAuthenticated)
+    {
+        <div class="dashboard-wrapper animate-fade-in">
+            <header class="dashboard-header mb-4">
+                <div>
+                    <h1>Corporate Roster Provisioning</h1>
+                    <p>Register organizational profiles and associate asset file structures dynamically.</p>
+                </div>
+            </header>
+
+            @if (!string.IsNullOrEmpty(statusMessage))
+            {
+                <div class="alert alert-success mb-4 text-center">@statusMessage</div>
+            }
+
+            <div class="mgmt-card max-width-md">
+                <h3>Provision Team Roster</h3>
+                <EditForm Model="@teamModel" OnValidSubmit="SubmitTeamMember" FormName="AddTeamForm">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" @bind-value="teamModel.Name" required placeholder="Full Name" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Corporate Role</label>
+                        <input type="text" class="form-control" @bind-value="teamModel.Role" required placeholder="e.g., Marketing Manager" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Professional Bio</label>
+                        <textarea class="form-control" @bind="teamModel.Bio" required rows="3" placeholder="Bio description..."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Avatar Asset Path</label>
+                        <input type="text" class="form-control" @bind-value="teamModel.ImagePath" required placeholder="images/team/filename.jpg" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" disabled="@isSaving">Commit to Database</button>
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private TeamMember teamModel = new();
+    private string statusMessage = string.Empty;
+    private bool isSaving = false;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && !AdminState.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/monarch-hq");
+        }
+    }
+
+    private async Task SubmitTeamMember()
+    {
+        isSaving = true;
+        statusMessage = string.Empty;
+
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, "http://apiservice/api/team");
+            request.Headers.Add("X-Admin-Token", AdminState.Token);
+            request.Content = JsonContent.Create(teamModel);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = $"Successfully provisioned {teamModel.Name} to the live organizational roster.";
+                teamModel = new();
+            }
+        }
+        catch (Exception)
+        {
+            statusMessage = "Error updating backend database records.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}

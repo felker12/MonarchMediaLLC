@@ -1,0 +1,77 @@
+﻿@page "/monarch-hq"
+@using MonarchMediaLLC.Shared
+@using MonarchMediaLLC.Web.Services
+@inject HttpClient Http
+@inject AdminStateProvider AdminState
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>HQ System Authorization</PageTitle>
+
+<div class="hq-container">
+    <div class="login-card animate-fade-in">
+        <div class="lock-header">
+            <div class="lock-icon">🔒</div>
+            <h2>Monarch HQ</h2>
+            <p>System operational override required.</p>
+        </div>
+
+        <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="HqLoginForm">
+            <div class="form-group mb-3">
+                <label class="form-label">Operator Username</label>
+                <input type="text" class="form-control" @bind-value="loginModel.UserName" required autocomplete="off" />
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label">Secret Passkey</label>
+                <input type="password" class="form-control" @bind-value="loginModel.Passkey" required />
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger py-2 mb-3">@errorMessage</div>
+            }
+
+            <button type="submit" class="btn btn-primary w-100 py-2" disabled="@isSubmitting">
+                @(isSubmitting ? "Verifying..." : "Authenticate")
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private AdminLoginRequest loginModel = new();
+    private string errorMessage = string.Empty;
+    private bool isSubmitting = false;
+
+    private async Task HandleLogin()
+    {
+        isSubmitting = true;
+        errorMessage = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/admin/verify", loginModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                AdminState.Login(loginModel.UserName, loginModel.Passkey);
+
+                // Pure redirect straight to the new management module page
+                Navigation.NavigateTo("monarch-hq/dashboard");
+            }
+            else
+            {
+                errorMessage = "Invalid operator credentials or unauthorized security layer.";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "Unable to route validation request to ApiService engine.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

@@ -142,3 +142,16 @@
         width: 80px !important; /* Scale logo down cleanly for mobile drawer layout views */
     }
 }
+
+.logout-item-wrapper {
+    transition: padding 0.2s ease;
+}
+
+.sidebar-collapsed .logout-text {
+    display: none;
+}
+
+.btn-outline-danger {
+    border-radius: 8px;
+    font-weight: 600;
+}

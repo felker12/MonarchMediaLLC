@@ -1,4 +1,9 @@
-﻿<div class="navmenu-container @(IsSidebarCollapsed ? "sidebar-collapsed" : "")">
+﻿@using MonarchMediaLLC.Web.Services
+@inject AdminStateProvider AdminState
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<div class="navmenu-container @(IsSidebarCollapsed ? "sidebar-collapsed" : "")">
 
     <div class="sidebar-header">
         <div class="logo-container">
@@ -17,13 +22,27 @@
     <div class="nav-scrollable">
         <nav class="nav flex-column">
 
-            @foreach (var link in NavigationLinks)
+            @foreach (var link in FilteredNavigationLinks)
             {
                 <div class="nav-item">
                     <NavLink class="nav-link" href="@link.Href" Match="@link.Match">
                         <img src="@link.IconPath" alt="" class="nav-icon" />
                         <span class="nav-text">@link.Label</span>
                     </NavLink>
+                </div>
+            }
+
+            @if (AdminState.IsAuthenticated)
+            {
+                <div class="nav-item logout-item-wrapper px-3 mt-4">
+                    <button class="btn btn-sm btn-outline-danger w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+                            @onclick="LogOutOperator">
+                        <span>🔒</span>
+                        @if (!IsSidebarCollapsed)
+                        {
+                            <span class="logout-text">Terminate Session</span>
+                        }
+                    </button>
                 </div>
             }
 
@@ -46,7 +65,13 @@
         public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
     }
 
-    private List<NavLinkItem> NavigationLinks => new()
+    protected override void OnInitialized()
+    {
+        // Subscribe to state changes so the navbar re-renders on login/logout
+        AdminState.OnStateChanged += InvokeStateHasChanged;
+    }
+
+    private List<NavLinkItem> BaseNavigationLinks => new()
     {
         new NavLinkItem { Href = "", Label = "Home", Match = NavLinkMatch.All, IconPath = "icons/house-door-fill.svg" },
         new NavLinkItem { Href = "about", Label = "About", IconPath = "icons/file-person-fill.svg" },
@@ -54,4 +79,53 @@
         new NavLinkItem { Href = "projects", Label = "Projects", IconPath = "icons/folder-fill.svg" },
         new NavLinkItem { Href = "contact", Label = "Contact", IconPath = "icons/chat-left-text.svg" },
     };
+
+    private List<NavLinkItem> FilteredNavigationLinks
+    {
+        get
+        {
+            // Create a completely distinct standalone list instance to modify safely
+            var links = new List<NavLinkItem>(BaseNavigationLinks);
+
+            if (AdminState.IsAuthenticated)
+            {  
+                links.Add(new NavLinkItem
+                {
+                    Href = "monarch-hq/dashboard",
+                    Label = "Dashboard",
+                    IconPath = "icons/gear-fill.svg"
+                });
+
+                links.Add(new NavLinkItem
+                {
+                    Href = "monarch-hq/projects",
+                    Label = "Manage Projects",
+                    IconPath = "icons/folder-plus.svg"
+                });
+
+                links.Add(new NavLinkItem
+                {
+                    Href = "monarch-hq/team",
+                    Label = "Manage Team",
+                    IconPath = "icons/people-fill.svg"
+                });
+            }
+
+            return links;
+        }
+    }
+
+    private void InvokeStateHasChanged() => InvokeAsync(StateHasChanged);
+
+    private void LogOutOperator()
+    {
+        AdminState.Logout();
+        Navigation.NavigateTo("/monarch-hq");
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe to prevent memory leaks
+        AdminState.OnStateChanged -= InvokeStateHasChanged;
+    }
 }
