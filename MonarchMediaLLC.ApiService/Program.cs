@@ -1,9 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+using MonarchMediaLLC.ApiService.Data;
 using MonarchMediaLLC.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
+
+// Configure EF Core with SQLite targeting a local database file
+var connectionString = builder.Configuration.GetConnectionString("MonarchDb") ?? "Data Source=monarch.db";
+builder.Services.AddDbContext<MonarchDbContext>(options =>
+    options.UseSqlite(connectionString));
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
@@ -21,16 +28,19 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.MapGet("/api/team", () => new List<TeamMember>
-{
-    new() { Name = "Christa Summerville", Role = "CEO & Executive Director", Bio = "Steers business strategy...", ImagePath = "images/team/Christa.jpg" },
-    new() { Name = "Anthony", Role = "Lead Systems Developer", Bio = "Architects ultra-performant modern web ecosystems...", ImagePath = "images/team/Anthony.jpg" }
-});
+// Dynamically query database items
+app.MapGet("/api/team", async (MonarchDbContext db) =>
+    await db.TeamMembers.ToListAsync());
 
-app.MapGet("/api/projects", () => new List<ProjectSummary>
+app.MapGet("/api/projects", async (MonarchDbContext db) =>
+    await db.ProjectSummaries.ToListAsync());
+
+// Automatically apply database migrations on startup for seamless maintenance
+using (var scope = app.Services.CreateScope())
 {
-    new() { Title = "Southard Homes", Description = "A custom architectural web portal...", TechStack = "Astro • TS • Tailwind", Url = "https://www.southardhomesllc.com/" }
-});
+    var db = scope.ServiceProvider.GetRequiredService<MonarchDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 app.MapDefaultEndpoints();
 app.Run();
