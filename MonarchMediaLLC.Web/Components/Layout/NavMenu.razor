@@ -8,14 +8,16 @@
                  class="logo-img" />
         </div>
 
-        <button class="btn-toggle"
-                @onclick="() => OnToggleSidebar.InvokeAsync()"
-                aria-label="Toggle Navigation">
+        @if (IsSidebarCollapsed || !IsSidebarCollapsed)
+        {
+            <button class="btn-toggle"
+                    @onclick="() => OnToggleSidebar.InvokeAsync()"
+                    aria-label="Toggle Navigation">
 
-            <span class="toggle-arrow"></span>
+                <span class="toggle-arrow"></span>
 
-        </button>
-
+            </button>
+        }
     </div>
 
     <div class="nav-scrollable">

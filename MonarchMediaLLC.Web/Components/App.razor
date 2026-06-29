@@ -17,24 +17,6 @@
     <Routes @rendermode="InteractiveServer" />
 
     <script src="@Assets["_framework/blazor.web.js"]"></script>
-
-    <script>
-        window.initSidebarResizeListener = (dotNetHelper) => {
-        // Run once on load to see if window is already small
-        if (window.innerWidth <= 768) {
-        dotNetHelper.invokeMethodAsync('SetSidebarState', true);
-        }
-
-        // Listen for browser window resizes
-        window.addEventListener('resize', () => {
-        if (window.innerWidth <= 768) {
-        dotNetHelper.invokeMethodAsync('SetSidebarState', true); // Collapse it
-        } else {
-        dotNetHelper.invokeMethodAsync('SetSidebarState', false); // Expand it
-        }
-        });
-        };
-    </script>
 </body>
 
 </html>

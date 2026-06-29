@@ -1,12 +1,43 @@
 ﻿@inherits LayoutComponentBase
-@inject IJSRuntime JS
-@implements IDisposable
 
 <div class="page">
+    <header class="mobile-top-bar">
+        <button class="btn btn-outline-light d-flex align-items-center justify-content-center"
+                type="button"
+                @onclick="ToggleMobileMenu"
+                aria-label="Toggle Navigation">
+            <div class="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+        <span class="mobile-brand-title">Monarch Media</span>
+    </header>
+
     <div class="sidebar @(isCollapsed ? "sidebar-collapsed" : "")">
-        <NavMenu IsSidebarCollapsed="isCollapsed"
-                 OnToggleSidebar="ToggleSidebar" />
+        <NavMenu IsSidebarCollapsed="isCollapsed" OnToggleSidebar="ToggleSidebar" />
     </div>
+
+    <div class="offcanvas offcanvas-start bg-dark text-white mobile-sidebar-drawer @(isMobileMenuOpen ? "show" : "")"
+         tabindex="-1"
+         style="visibility: @(isMobileMenuOpen ? "visible" : "hidden");"
+         id="mobileNavMenu">
+        <div class="offcanvas-header border-bottom border-secondary px-4 py-3">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close btn-close-white" @onclick="ToggleMobileMenu" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div @onclick="CloseMobileMenu">
+                <NavMenu IsSidebarCollapsed="false" />
+            </div>
+        </div>
+    </div>
+
+    @if (isMobileMenuOpen)
+    {
+        <div class="offcanvas-backdrop fade show" @onclick="ToggleMobileMenu"></div>
+    }
 
     <main>
         <article class="content px-4">
@@ -23,16 +54,7 @@
 
 @code {
     private bool isCollapsed;
-    private DotNetObjectReference<MainLayout>? objRef;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            objRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("initSidebarResizeListener", objRef);
-        }
-    }
+    private bool isMobileMenuOpen = false;
 
     private void ToggleSidebar()
     {
@@ -40,18 +62,13 @@
         StateHasChanged();
     }
 
-    [JSInvokable]
-    public void SetSidebarState(bool shouldCollapse)
+    private void ToggleMobileMenu()
     {
-        if (isCollapsed != shouldCollapse)
-        {
-            isCollapsed = shouldCollapse;
-            StateHasChanged();
-        }
+        isMobileMenuOpen = !isMobileMenuOpen;
     }
 
-    public void Dispose()
+    private void CloseMobileMenu()
     {
-        objRef?.Dispose();
+        isMobileMenuOpen = false;
     }
 }

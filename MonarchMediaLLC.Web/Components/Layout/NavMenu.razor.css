@@ -129,3 +129,13 @@
 .sidebar-collapsed .toggle-arrow {
     transform: rotate(-135deg);
 }
+
+@media (max-width: 768px) {
+    .btn-toggle {
+        display: none !important; /* Hides the desktop toggle circle when rendered in mobile offcanvas */
+    }
+
+    .logo-container img {
+        width: 80px !important; /* Scale logo cleanly for mobile drawer viewports */
+    }
+}

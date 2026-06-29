@@ -4,12 +4,15 @@
     background: #FFFDF8;
 }
 
+/* Persistent Desktop Sidebar Configuration */
 .sidebar {
     width: 260px;
     min-width: 260px;
     background: #161616;
     border-right: 4px solid rgba(230,126,34,.4);
     height: 100vh;
+    position: sticky;
+    top: 0;
     overflow: visible;
     transition: width .3s ease, min-width .3s ease;
 }
@@ -18,6 +21,46 @@
         width: 80px;
         min-width: 80px;
     }
+
+/* Mobile-only Top Nav Header Bar (hidden on desktop) */
+.mobile-top-bar {
+    display: none;
+    background: #161616;
+    border-bottom: 4px solid rgba(230,126,34,.4);
+    padding: 0.75rem 1.5rem;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mobile-brand-title {
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
+
+/* Custom CSS Hamburger graphics inside the button */
+.hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 18px;
+    height: 12px;
+}
+
+    .hamburger-icon span {
+        display: block;
+        height: 2px;
+        width: 100%;
+        background-color: white;
+        border-radius: 1px;
+    }
+
+/* Background overrides for the offcanvas container background colors */
+.mobile-sidebar-drawer {
+    background-color: #161616 !important;
+    max-width: 280px;
+}
 
 main {
     flex: 1;
@@ -29,13 +72,26 @@ article {
     padding: 3rem;
 }
 
+/* ==========================================================================
+   RESPONSIVE LAYOUT BREAKPOINT
+   ========================================================================== */
 @media (max-width: 768px) {
-
     .page {
-        flex-direction: row;
+        flex-direction: column; /* Stack top-bar above content area */
+    }
+
+    .mobile-top-bar {
+        display: flex; /* Bring the navbar toggler header into play */
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+    }
+
+    .sidebar {
+        display: none; /* Safely remove the desktop strip layout entirely */
     }
 
     article {
-        padding: 1.5rem;
+        padding: 1.5rem; /* Free up reading gutters */
     }
 }
