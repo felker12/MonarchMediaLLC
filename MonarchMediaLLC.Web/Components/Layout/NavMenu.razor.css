@@ -7,11 +7,12 @@
 
 .logo-container {
     padding: 1rem;
-    /*background: #E67E2266;*/ /* 66 is 40% opacity */
-    background: color-mix( in srgb, #E67E2266, transparent 30% );
+    /* Soft translucent purple background */
+    background: color-mix(in srgb, rgba(155, 93, 229, 0.4), transparent 30%);
     border-radius: 50%;
-    border: 1px solid #E67E2266; /* 66 is 40% opacity */
-    box-shadow: 0 6px 20px #E67E22B3; /* B3 is 70% opacity */
+    border: 1px solid rgba(155, 93, 229, 0.4);
+    /* Rich purple neon drop shadow glow */
+    box-shadow: 0 6px 20px rgba(155, 93, 229, 0.6);
     transition: all .3s ease;
 }
 
@@ -42,14 +43,14 @@
     }
 
         .nav-item ::deep a:hover {
-            background: rgba(230,126,34,.20);
-            color: white;
+            background: rgba(155, 93, 229, 0.15);
+            color: #9B5DE5;
         }
 
         .nav-item ::deep a.active {
-            background: rgba(230,126,34,.30);
+            background: rgba(155, 93, 229, 0.25);
             color: white;
-            border-left: 4px solid #E67E22;
+            border-left: 3px solid #9B5DE5;
         }
 
 .bi {
@@ -80,7 +81,7 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 2px solid #E67E22;
+    border: 2px solid #9B5DE5; /* Purple border */
     background: #161616;
     color: white;
     display: flex;
@@ -91,7 +92,7 @@
 }
 
     .btn-toggle:hover {
-        background: #E67E22;
+        background: #9B5DE5; /* Fills with purple on hover */
     }
 
 .toggle-arrow {
