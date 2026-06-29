@@ -12,12 +12,12 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddOutputCache();
 
-builder.Services.AddHttpClient<WeatherApiClient>(client =>
-    {
-        // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-        // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https+http://apiservice");
-    });
+builder.Services.AddScoped<MonarchMediaLLC.Web.Services.AdminStateProvider>();
+
+builder.Services.AddHttpClient("", client =>
+{
+    client.BaseAddress = new Uri("http://apiservice");
+});
 
 var app = builder.Build();
 

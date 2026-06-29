@@ -17,4 +17,10 @@
         public string TechStack { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
     }
+
+    public class AdminLoginRequest
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string Passkey { get; set; } = string.Empty;
+    }
 }

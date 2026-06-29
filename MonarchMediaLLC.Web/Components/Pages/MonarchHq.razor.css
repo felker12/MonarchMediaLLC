@@ -1,0 +1,166 @@
+.hq-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+/* LOCK SCREEN */
+.login-card {
+    background: #1E1E1E;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 16px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.lock-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.lock-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.lock-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.02em;
+}
+
+.lock-header p {
+    color: #A0A0A0;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* INPUT COMPONENTS FORM CONTROL OPTIONS */
+.form-label {
+    color: #D8D8D8;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    background: #121212 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #FFFFFF !important;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+}
+
+    .form-control:focus {
+        border-color: #9B5DE5 !important;
+        box-shadow: 0 0 0 0.25rem rgba(155, 93, 229, 0.15) !important;
+    }
+
+/* DASHBOARD PANEL WRAPPERS */
+.dashboard-wrapper {
+    width: 100%;
+    align-self: flex-start;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 2rem;
+    margin-bottom: 3rem;
+}
+
+    .dashboard-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .dashboard-header p {
+        color: #A0A0A0;
+        margin: 0;
+    }
+
+.text-gradient {
+    color: #9B5DE5;
+    text-shadow: 0 0 30px rgba(155, 93, 229, 0.2);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 2.5rem;
+    align-items: start;
+}
+
+.mgmt-card {
+    background: #1E1E1E;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 14px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+    .mgmt-card h3 {
+        font-size: 1.3rem;
+        color: #FFFFFF;
+        margin-bottom: 2rem;
+        font-weight: 700;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 0.75rem;
+        letter-spacing: -0.01em;
+    }
+
+.btn-outline-danger {
+    color: #E52850;
+    border: 2px solid rgba(229, 40, 80, 0.3);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+    .btn-outline-danger:hover {
+        background: #E52850;
+        border-color: #E52850;
+        color: #FFFFFF;
+    }
+
+/* ANIMATION TIMINGS */
+.animate-fade-in {
+    animation: hqFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes hqFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+}
