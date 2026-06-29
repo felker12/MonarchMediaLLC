@@ -1,4 +1,105 @@
 ﻿@page "/about"
+@using MonarchMediaLLC.Shared
+@inject HttpClient Http
 <PageTitle>About</PageTitle>
 
-<h3>About</h3>
+<div class="about-container">
+
+    <!-- SECTION 1: HERO HOOK -->
+    <section class="hero-section">
+        <h1 class="hero-title">The Blueprint Behind <br /><span class="text-gradient">The Performance</span></h1>
+        <p class="hero-subtitle">
+            Monarch Media LLC is an agile creative and engineering studio. We combine hyper-optimized
+            development architectures with modern branding systems to give businesses an undeniable edge.
+        </p>
+    </section>
+
+    <!-- SECTION 2: METRIC COUNTERS -->
+    <section class="metrics-section">
+        <div class="metric-card">
+            <h3 class="metric-number">5</h3>
+            <p class="metric-label">Platforms Launched</p>
+        </div>
+        <div class="metric-card">
+            <h3 class="metric-number">100%</h3>
+            <p class="metric-label">Custom Engineered</p>
+        </div>
+        <div class="metric-card">
+            <h3 class="metric-number">Full</h3>
+            <p class="metric-label">Stack Capabilities</p>
+        </div>
+    </section>
+
+    <!-- SECTION 3: FULL-STACK & JAMSTACK OPERATIONAL PILLARS -->
+    <section class="values-section">
+        <h2 class="section-title">Our Operational Capabilities</h2>
+        <div class="values-grid">
+            <div class="value-card">
+                <img src="icons/lightning-charge-fill.svg" alt="" class="value-icon" />
+                <h3>Decoupled Performance</h3>
+                <p>We deploy modern JAMstack architectures using frameworks like Astro for unmatched speed and SEO, ensuring your public-facing brand assets load instantly and rank cleanly.</p>
+            </div>
+            <div class="value-card">
+                <img src="icons/layer-backward.svg" alt="" class="value-icon" /> <!-- Note: Ensure icon exists or use a server/database icon -->
+                <h3>Complex Full-Stack Solutions</h3>
+                <p>Beyond standard websites, we engineer data-driven web applications, custom API integrations, interactive client portals, and secure database architectures tailored to your business operations.</p>
+            </div>
+            <div class="value-card">
+                <img src="icons/shield-check.svg" alt="" class="value-icon" />
+                <h3>Type-Safe Reliability</h3>
+                <p>By enforcing strict TypeScript and robust backend engineering patterns, we build resilient software that handles complex user logic, minimizes downtime, and scales predictably.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: TEAM GRID -->
+    <section class="gallery-section">
+        <h2 class="section-title">Meet The Minds</h2>
+        <p class="section-subtitle">The focused, specialized unit designing and driving our client projects.</p>
+
+        <div class="team-grid">
+            @foreach (var member in TeamMembers ?? new List<TeamMember>()) //if TeamMembers is null, use an empty list to avoid null reference exceptions
+            {
+                <div class="team-card">
+                    <div class="avatar-wrapper">
+                        <img src="@member.ImagePath" alt="@member.Name" class="avatar-img" />
+                    </div>
+                    <div class="team-info">
+                        <h4>@member.Name</h4>
+                        <span class="team-role">@member.Role</span>
+                        <p class="team-bio">@member.Bio</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private class TeamMember
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string Bio { get; set; } = string.Empty;
+        public string ImagePath { get; set; } = string.Empty;
+    }
+
+    @code {
+        private List<TeamMember>? TeamMembers;
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                //"apiservice" matches the registration name given inside  AppHost
+                TeamMembers = await Http.GetFromJsonAsync<List<TeamMember>>("http://apiservice/api/team");
+            }
+            catch (Exception ex)
+            {
+                //Handle fallback error caching or logging gracefully 
+                //TODO: Implement a more robust error handling strategy, possibly with user feedback or retry logic.
+                Console.WriteLine($"Error fetching team members: {ex.Message}");
+            }
+        }
+    }
+}

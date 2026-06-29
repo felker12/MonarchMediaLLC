@@ -1,6 +1,83 @@
 ﻿@page "/"
-
 <PageTitle>Home</PageTitle>
 
-<h1>Monarch Media</h1>
+<div class="home-container">
 
+    <!-- HERO SECTION -->
+    <section class="hero-section animate-fade-in">
+        <div class="badge-container">
+            <span class="status-badge">Full-Stack Capabilities</span>
+        </div>
+        <h1 class="hero-title">
+            We Build Digital <br />
+            <span class="text-gradient">Monarchs</span>
+        </h1>
+        <p class="hero-subtitle">
+            Monarch Media LLC bridges the gap between hyper-optimized JAMstack performance and
+            complex, data-driven software architectures built to scale your business operations.
+        </p>
+        <div class="cta-group">
+            <a href="projects" class="btn btn-primary btn-lg">Explore Our Work</a>
+            <a href="contact" class="btn btn-outline-secondary btn-lg">Let's Talk Strategy</a>
+        </div>
+    </section>
+
+    <!-- FEATURED WORK HUB -->
+    <section class="portfolio-section">
+        <h2 class="section-title">Engineered Platforms</h2>
+        <p class="section-subtitle">A snapshot of live modern web applications deployed across our network.</p>
+
+        <div class="portfolio-grid">
+            @foreach (var project in FeaturedProjects)
+            {
+                <a href="@project.Url" target="_blank" rel="noopener" class="project-card">
+                    <div class="project-card-header">
+                        <span class="project-tag">@project.TechStack</span>
+                    </div>
+                    <div class="project-card-body">
+                        <h3>@project.Title</h3>
+                        <p>@project.Description</p>
+                    </div>
+                    <div class="project-card-footer">
+                        <span class="launch-link">Launch Platform <span class="arrow">→</span></span>
+                    </div>
+                </a>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private class ProjectSummary
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string TechStack { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+    }
+
+    private List<ProjectSummary> FeaturedProjects => new()
+    {
+        new ProjectSummary
+        {
+            Title = "Southard Homes",
+            Description = "A custom architectural web portal featuring high-performance image lightboxes and 2D/3D floorplan matrices.",
+            TechStack = "Astro • TS • Tailwind",
+            Url = "https://www.southardhomesllc.com/"
+        },
+        new ProjectSummary
+        {
+            Title = "Quality Electric of Indiana",
+            Description = "Corporate communication platform optimizing structural local SEO and service maps for the Wabash Valley area.",
+            TechStack = "Astro • TS • Tailwind",
+            Url = "https://qualityelectricofindiana.com/"
+        },
+        new ProjectSummary
+        {
+            Title = "Quality Landscape & Leisure",
+            Description = "A sleek showcase layout capturing service inquiries with rich graphic fidelity and zero static runtime bloat.",
+            TechStack = "JAMstack Architecture",
+            Url = "https://qualitylandscapeandleisure.netlify.app/"
+        }
+    };
+}

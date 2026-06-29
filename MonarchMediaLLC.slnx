@@ -2,5 +2,6 @@
   <Project Path="MonarchMediaLLC.ApiService/MonarchMediaLLC.ApiService.csproj" />
   <Project Path="MonarchMediaLLC.AppHost/MonarchMediaLLC.AppHost.csproj" />
   <Project Path="MonarchMediaLLC.ServiceDefaults/MonarchMediaLLC.ServiceDefaults.csproj" />
+  <Project Path="MonarchMediaLLC.Shared/MonarchMediaLLC.Shared.csproj" Id="326219c8-96f6-4033-962a-0644cfe91710" />
   <Project Path="MonarchMediaLLC.Web/MonarchMediaLLC.Web.csproj" />
 </Solution>

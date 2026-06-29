@@ -1,7 +1,7 @@
 .page {
     display: flex;
     min-height: 100vh;
-    background: #FFFDF8;
+    background: var(--bg);
 }
 
 /* Persistent Desktop Sidebar Configuration */
@@ -9,7 +9,7 @@
     width: 260px;
     min-width: 260px;
     background: #161616;
-    border-right: 4px solid rgba(155, 93, 229, 0.4); /* Updated to Purple Accent */
+    border-right: 4px solid rgba(155, 93, 229, 0.4);
     height: 100vh;
     position: sticky;
     top: 0;
@@ -26,7 +26,7 @@
 .mobile-top-bar {
     display: none;
     background: #161616;
-    border-bottom: 4px solid rgba(155, 93, 229, 0.4); /* Updated to Purple Accent */
+    border-bottom: 4px solid rgba(155, 93, 229, 0.4);
     padding: 0.75rem 1.5rem;
     align-items: center;
     gap: 1rem;
@@ -52,7 +52,6 @@
         display: block;
         height: 2px;
         width: 100%;
-        background-color: white;
         border-radius: 1px;
     }
 
@@ -62,36 +61,56 @@
     max-width: 280px;
 }
 
+/* Default State: Light purple border on the outer button wrapper */
+.mobile-top-bar .btn-outline-light {
+    border-color: rgba(155, 93, 229, 0.5) !important;
+    transition: all 0.2s ease;
+}
+
+    /* Default State: Electric purple hamburger lines */
+    .mobile-top-bar .btn-outline-light .hamburger-icon span {
+        background-color: #9B5DE5;
+        transition: background-color 0.2s ease;
+    }
+
+    /* Hover State: Outer button fills with solid stark white */
+    .mobile-top-bar .btn-outline-light:hover {
+        background-color: #FFFFFF !important;
+        border-color: #FFFFFF !important;
+    }
+
+        /* Hover State: The inner purple lines swap to dark black to pop off the white */
+        .mobile-top-bar .btn-outline-light:hover .hamburger-icon span {
+            background-color: #161616;
+        }
+
 main {
     flex: 1;
     min-width: 0;
-    background: #FFFDF8;
+    background: var(--bg);
 }
 
 article {
     padding: 3rem;
 }
 
-/* ==========================================================================
-   RESPONSIVE LAYOUT BREAKPOINT
-   ========================================================================== */
 @media (max-width: 768px) {
     .page {
-        flex-direction: column; /* Stack top-bar above content area */
+        flex-direction: column;
     }
 
     .mobile-top-bar {
-        display: flex; /* Bring the navbar toggler header into play */
+        display: flex;
         position: sticky;
         top: 0;
         z-index: 1030;
     }
 
     .sidebar {
-        display: none; /* Safely remove the desktop strip layout entirely */
+        display: none;
     }
 
     article {
-        padding: 1.5rem; /* Free up reading gutters */
+        padding: 1.5rem;
     }
 }
