@@ -1,105 +1,341 @@
 ﻿@page "/about"
-@using MonarchMediaLLC.Shared
 @inject HttpClient Http
 <PageTitle>About</PageTitle>
 
 <div class="about-container">
-
-    <!-- SECTION 1: HERO HOOK -->
+    <!-- ==========================================================
+         HERO
+    =========================================================== -->
     <section class="hero-section">
-        <h1 class="hero-title">The Blueprint Behind <br /><span class="text-gradient">The Performance</span></h1>
+        <h1 class="hero-title">
+            The Blueprint Behind
+            <br />
+            <span class="text-gradient">The Performance</span>
+        </h1>
+
         <p class="hero-subtitle">
-            Monarch Media LLC is an agile creative and engineering studio. We combine hyper-optimized
-            development architectures with modern branding systems to give businesses an undeniable edge.
+            Monarch Media LLC is a software development and digital solutions
+            studio focused on building fast websites, scalable web applications,
+            and modern business systems that help companies grow.
         </p>
     </section>
 
-    <!-- SECTION 2: METRIC COUNTERS -->
-    <section class="metrics-section">
-        <div class="metric-card">
-            <h3 class="metric-number">5</h3>
-            <p class="metric-label">Platforms Launched</p>
-        </div>
-        <div class="metric-card">
-            <h3 class="metric-number">100%</h3>
-            <p class="metric-label">Custom Engineered</p>
-        </div>
-        <div class="metric-card">
-            <h3 class="metric-number">Full</h3>
-            <p class="metric-label">Stack Capabilities</p>
+    <!-- ==========================================================
+         WHY WE EXIST
+    =========================================================== -->
+    <section class="hero-section">
+        <h2 class="section-title">
+            Why <span class="text-gradient">Monarch</span> Exists
+        </h2>
+
+        <p class="hero-subtitle">
+            Most agencies stop after launching a beautiful website.
+        </p>
+
+        <p class="hero-subtitle">
+            We believe technology should become part of how a business operates,
+            not just how it looks online.
+        </p>
+
+        <p class="hero-subtitle">
+            That's why we combine modern software engineering with professional
+            branding to create systems that improve marketing, streamline
+            operations, and support long-term growth.
+        </p>
+    </section>
+
+    <!-- ==========================================================
+         PRINCIPLES
+    =========================================================== -->
+    <section class="principles-section">
+        <h2 class="section-title">
+            Everything We Build Is Guided By Four Principles
+        </h2>
+
+        <p class="section-subtitle">
+            Every project is designed with these core values from day one.
+        </p>
+
+        <div class="principles-grid">
+
+            <div class="principle">
+                <span class="principle-number">01</span>
+
+                <h3>Performance</h3>
+
+                <p>
+                    Fast websites create better user experiences, rank higher in
+                    search engines, and convert more visitors into customers.
+                </p>
+            </div>
+
+            <div class="principle">
+                <span class="principle-number">02</span>
+
+                <h3>Security</h3>
+
+                <p>
+                    From secure authentication to protected databases, we build
+                    software that businesses can trust.
+                </p>
+            </div>
+
+            <div class="principle">
+                <span class="principle-number">03</span>
+
+                <h3>Scalability</h3>
+
+                <p>
+                    Your technology should grow alongside your business instead
+                    of needing to be rebuilt every few years.
+                </p>
+            </div>
+
+            <div class="principle">
+                <span class="principle-number">04</span>
+
+                <h3>Automation</h3>
+
+                <p>
+                    Repetitive work should be handled by software so your team
+                    can focus on serving customers and growing the business.
+                </p>
+            </div>
         </div>
     </section>
 
-    <!-- SECTION 3: FULL-STACK & JAMSTACK OPERATIONAL PILLARS -->
+    <!-- ==========================================================
+         WHAT WE BUILD
+    =========================================================== -->
     <section class="values-section">
-        <h2 class="section-title">Our Operational Capabilities</h2>
+        <h2 class="section-title">
+            What We Build
+        </h2>
+
+        <p class="section-subtitle">
+            Every solution is custom engineered around your goals—not forced
+            into a one-size-fits-all template.
+        </p>
+
         <div class="values-grid">
             <div class="value-card">
-                <img src="icons/lightning-charge-fill.svg" alt="" class="value-icon" />
-                <h3>Decoupled Performance</h3>
-                <p>We deploy modern JAMstack architectures using frameworks like Astro for unmatched speed and SEO, ensuring your public-facing brand assets load instantly and rank cleanly.</p>
+                <img src="icons/lightning-charge-fill.svg"
+                     class="value-icon"
+                     alt="" />
+
+                <h3>High-Performance Websites</h3>
+
+                <p>
+                    Built with modern frameworks like Astro to maximize speed,
+                    SEO, accessibility, and long-term maintainability.
+                </p>
+
             </div>
+
             <div class="value-card">
-                <img src="icons/layer-backward.svg" alt="" class="value-icon" /> <!-- Note: Ensure icon exists or use a server/database icon -->
-                <h3>Complex Full-Stack Solutions</h3>
-                <p>Beyond standard websites, we engineer data-driven web applications, custom API integrations, interactive client portals, and secure database architectures tailored to your business operations.</p>
+                <img src="icons/layer-backward.svg"
+                     class="value-icon"
+                     alt="" />
+
+                <h3>Custom Business Applications</h3>
+
+                <p>
+                    Internal dashboards, customer portals, API integrations,
+                    database systems, and business software built around your
+                    workflow.
+                </p>
+
             </div>
+
             <div class="value-card">
-                <img src="icons/shield-check.svg" alt="" class="value-icon" />
-                <h3>Type-Safe Reliability</h3>
-                <p>By enforcing strict TypeScript and robust backend engineering patterns, we build resilient software that handles complex user logic, minimizes downtime, and scales predictably.</p>
+
+                <img src="icons/shield-check.svg"
+                     class="value-icon"
+                     alt="" />
+
+                <h3>Reliable Software</h3>
+
+                <p>
+                    Modern engineering practices, strong typing, testing, and
+                    scalable architecture ensure software that continues working
+                    as your business grows.
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- SECTION 4: TEAM GRID -->
-    <section class="gallery-section">
-        <h2 class="section-title">Meet The Minds</h2>
-        <p class="section-subtitle">The focused, specialized unit designing and driving our client projects.</p>
+    <!-- ==========================================================
+         OUR PROCESS
+    =========================================================== -->
+    <section class="process-section">
+        <h2 class="section-title">
+            Our Process
+        </h2>
 
-        <div class="team-grid">
-            @foreach (var member in TeamMembers ?? new List<TeamMember>()) //if TeamMembers is null, use an empty list to avoid null reference exceptions
-            {
-                <div class="team-card">
-                    <div class="avatar-wrapper">
-                        <img src="@member.ImagePath" alt="@member.Name" class="avatar-img" />
+        <p class="section-subtitle">
+            Every successful project follows a clear roadmap—from the first
+            conversation to long-term support.
+        </p>
+
+        <div class="process-card">
+            <div class="process-flow">
+                @for (int i = 0; i < ProcessSteps.Count; i++)
+                {
+                    var step = ProcessSteps[i];
+
+                    <div class="process-item">
+
+                        <div class="process-step">
+
+                            <div class="process-circle">
+                                @step.Title
+                            </div>
+
+                            <p>@step.Description</p>
+                        </div>
+
+                        @if (i < ProcessSteps.Count - 1)
+                        {
+                            <div class="process-arrow">
+
+                                <img class="desktop-arrow"
+                                     src="/icons/arrow-right.svg"
+                                     alt="" />
+
+                                <img class="mobile-arrow"
+                                     src="/icons/arrow-down.svg"
+                                     alt="" />
+
+                            </div>
+                        }
                     </div>
-                    <div class="team-info">
-                        <h4>@member.Name</h4>
-                        <span class="team-role">@member.Role</span>
-                        <p class="team-bio">@member.Bio</p>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         TEAM
+    =========================================================== -->
+    <section class="gallery-section">
+
+        <h2 class="section-title">
+            Meet The Minds
+        </h2>
+
+        <p class="section-subtitle">
+            The people behind the strategy, engineering, and creativity that
+            power every Monarch Media project.
+        </p>
+
+        @if (TeamMembers == null)
+        {
+            <div class="text-center py-5">
+
+                <span class="spinner-border spinner-border-sm me-2"></span>
+
+                Loading team members...
+            </div>
+        }
+        else if (!TeamMembers.Any())
+        {
+            <div class="text-center py-5 text-muted">
+
+                Team members will appear here as they're added.
+
+            </div>
+        }
+        else
+        {
+            <div class="team-grid">
+                @foreach (var member in TeamMembers)
+                {
+                    <div class="team-card">
+
+                        <div class="avatar-wrapper">
+                            <img src="@member.ImagePath"
+                                 alt="@member.Name"
+                                 class="avatar-img" />
+                        </div>
+
+                        <div class="team-info">
+                            <h4>@member.Name</h4>
+
+                            <span class="team-role">
+                                @member.Role
+                            </span>
+
+                            <p class="team-bio">
+                                @member.Bio
+                            </p>
+                        </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
+        }
+    </section>
+
+    <!-- ==========================================================
+         CTA
+    =========================================================== -->
+    <section>
+        <div class="cta-card">
+            <h2 class="cta-title">
+                Ready to Build Something Great?
+            </h2>
+            <p class="cta-subtitle">
+                Let's discuss your project and how we can help you achieve your goals.
+            </p>
+            <NavLink class="btn btn-primary cta-button"
+                     href="/contact">
+                Get In Touch →
+            </NavLink>
         </div>
     </section>
 </div>
 
 @code {
-    private class TeamMember
+    private List<TeamMember>? TeamMembers;
+
+    protected override async Task OnInitializedAsync()
     {
-        public string Name { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
-        public string Bio { get; set; } = string.Empty;
-        public string ImagePath { get; set; } = string.Empty;
-    }
-
-    @code {
-        private List<TeamMember>? TeamMembers;
-
-        protected override async Task OnInitializedAsync()
+        try
         {
-            try
-            {
-                //"apiservice" matches the registration name given inside  AppHost
-                TeamMembers = await Http.GetFromJsonAsync<List<TeamMember>>("http://apiservice/api/team");
-            }
-            catch (Exception ex)
-            {
-                //Handle fallback error caching or logging gracefully 
-                //TODO: Implement a more robust error handling strategy, possibly with user feedback or retry logic.
-                Console.WriteLine($"Error fetching team members: {ex.Message}");
-            }
+            TeamMembers =
+                await Http.GetFromJsonAsync<List<TeamMember>>(
+                    "http://apiservice/api/team");
+        }
+        catch
+        {
+            TeamMembers = new();
         }
     }
+
+    private sealed class TeamMember
+    {
+        public string Name { get; set; } = "";
+        public string Role { get; set; } = "";
+        public string Bio { get; set; } = "";
+        public string ImagePath { get; set; } = "";
+    }
+
+    private readonly List<ProcessStep> ProcessSteps =
+    [
+        new("Discovery",
+            "We learn about your business, goals, audience, and current challenges before planning the solution."),
+
+        new("Design",
+            "Wireframes, branding, user experience, and technical planning ensure everyone is aligned before development."),
+
+        new("Build",
+            "Using modern frameworks and clean architecture, we build software focused on performance, security, and maintainability."),
+
+        new("Launch",
+            "Thorough testing and deployment ensure a smooth release with minimal disruption to your business."),
+
+        new("Growth",
+            "We continue improving your platform through maintenance, optimization, analytics, automation, and future development.")
+    ];
+
+    private record ProcessStep(string Title, string Description);
 }
