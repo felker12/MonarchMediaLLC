@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MonarchMediaLLC.ApiService.Data;
 using MonarchMediaLLC.Shared;
-using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
