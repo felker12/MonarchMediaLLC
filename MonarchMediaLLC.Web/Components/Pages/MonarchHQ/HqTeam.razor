@@ -92,6 +92,23 @@
                                      style="font-size: 0.8rem; background: #121212; border: 1px solid rgba(255, 255, 255, 0.12); color: #A0A0A0;">
                                     📁 @member.ImagePath
                                 </div>
+
+                                <!-- LIVE AVATAR RENDER PREVIEW -->
+                                <div class="mt-3 text-center d-flex align-items-center justify-content-center bg-dark rounded border border-secondary"
+                                     style="height: 140px; background: #121212 !important; border-color: rgba(255, 255, 255, 0.06) !important; overflow: hidden;">
+                                    @if (!string.IsNullOrWhiteSpace(member.ImagePath))
+                                    {
+                                        <img src="@member.ImagePath"
+                                             alt="@member.Name's profile asset preview"
+                                             class="img-fluid h-100 w-auto"
+                                             style="object-fit: cover; transition: opacity 0.2s;"
+                                             @onerror='(e) => { /* Optional: Handle broken paths gracefully if needed */ }' />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted text-xs">No image asset specified</span>
+                                    }
+                                </div>
                             </div>
 
                             <div class="mt-3 border-top border-secondary pt-3 d-flex gap-2">
