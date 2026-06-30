@@ -4,6 +4,7 @@
 @inject HttpClient Http
 @inject AdminStateProvider AdminState
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 @rendermode InteractiveServer
 
 <PageTitle>HQ Projects Management</PageTitle>
@@ -24,7 +25,7 @@
                 <div class="alert alert-success mb-4 text-center">@statusMessage</div>
             }
 
-            <div class="mgmt-card max-width-md">
+            <div class="mgmt-card max-width-md mb-5">
                 <h3>Deploy New Project Card</h3>
                 <EditForm Model="@projectModel" OnValidSubmit="SubmitProject" FormName="AddProjectForm">
                     <div class="mb-3">
@@ -37,7 +38,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Tech Stack Tags</label>
-                        <input type="text" class="form-control" @bind-value="projectModel.TechStack" required placeholder="e.g., Astro • TS • Tailwind" />
+                        <input type="text" class="form-control" @bind-value="projectModel.TechStack" required placeholder="e.g., Astro, TS, Tailwind" />
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Launch URL</label>
@@ -46,20 +47,145 @@
                     <button type="submit" class="btn btn-primary w-100" disabled="@isSaving">Commit to Database</button>
                 </EditForm>
             </div>
+
+            <hr class="border-secondary my-5" style="opacity: 0.15;" />
+
+            <div class="preview-header mb-4">
+                <h2>Live Database Preview</h2>
+                <p>Current items pulled dynamically from SQLite production storage.</p>
+            </div>
+
+            @if (isLoadingProjects)
+            {
+                <div class="text-muted py-3">
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span> Querying backend API data...
+                </div>
+            }
+            else if (existingProjects == null || !existingProjects.Any())
+            {
+                <div class="alert alert-info text-center py-4">
+                    💡 No project entries found in the database. Use the form above to deploy your first card.
+                </div>
+            }
+            else
+            {
+                <div class="dashboard-grid">
+                    @foreach (var project in existingProjects)
+                    {
+                        <div class="mgmt-card d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-dark border border-secondary text-light px-2.5 py-1.5" style="font-size: 0.75rem;">
+                                        ID: @project.Id
+                                    </span>
+                                    <button class="btn btn-sm btn-link text-gradient p-0 font-weight-bold text-decoration-none"
+                                            @onclick="() => OpenEditModal(project)">
+                                        ✏️ Edit Card
+                                    </button>
+                                </div>
+                                <h4 class="text-white font-weight-bold mt-1 mb-2">@project.Title</h4>
+                                <p class="text-muted text-sm mb-3">@project.Description</p>
+
+                                <div class="tech-stack-wrapper mb-3 text-gradient font-weight-bold text-sm">
+                                    🛠️ @FormatTechStack(project.TechStack)
+                                </div>
+                            </div>
+
+                            <div class="mt-3 border-top border-secondary pt-3 d-flex gap-2">
+                                <a href="@project.Url" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary text-light flex-grow-1 py-2">
+                                    Visit Live Deployment ↗
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger px-3 d-flex align-items-center justify-content-center"
+                                        @onclick="() => DeleteProject(project.Id, project.Title)"
+                                        aria-label="Delete Project">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     }
 </div>
 
+@if (isModalOpen && editingModel != null)
+{
+    <div class="custom-modal-backdrop animate-fade-in" @onclick="CloseEditModal">
+        <div class="custom-modal-content" @onclick:stopPropagation>
+            <div class="custom-modal-header">
+                <h3>Update Portfolio Card (ID: @editingId)</h3>
+                <button type="button" class="btn-close-modal" @onclick="CloseEditModal">&times;</button>
+            </div>
+            <div class="custom-modal-body">
+                <EditForm Model="@editingModel" OnValidSubmit="UpdateProject" FormName="UpdateProjectForm">
+                    <div class="mb-3">
+                        <label class="form-label">Project Title</label>
+                        <input type="text" class="form-control" @bind-value="editingModel.Title" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" @bind="editingModel.Description" required rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tech Stack Tags</label>
+                        <input type="text" class="form-control" @bind-value="editingModel.TechStack" required />
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Launch URL</label>
+                        <input type="url" class="form-control" @bind-value="editingModel.Url" required />
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary text-light w-50 py-2" @onclick="CloseEditModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary w-50 py-2" disabled="@isSaving">Save Changes</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private ProjectSummary projectModel = new();
+    private List<ProjectSummary>? existingProjects;
     private string statusMessage = string.Empty;
     private bool isSaving = false;
+    private bool isLoadingProjects = true;
 
-    protected override void OnAfterRender(bool firstRender)
+    // Modal Control State variables
+    private bool isModalOpen = false;
+    private int editingId;
+    private ProjectSummary? editingModel;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !AdminState.IsAuthenticated)
+        if (firstRender)
         {
-            Navigation.NavigateTo("/monarch-hq");
+            if (!AdminState.IsAuthenticated)
+            {
+                Navigation.NavigateTo("/monarch-hq");
+                return;
+            }
+            await LoadProjects();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadProjects()
+    {
+        isLoadingProjects = true;
+        try
+        {
+            existingProjects = await Http.GetFromJsonAsync<List<ProjectSummary>>("http://apiservice/api/projects");
+        }
+        catch (Exception)
+        {
+            statusMessage = "Warning: Failed to fetch existing portfolio items from backend engine.";
+        }
+        finally
+        {
+            isLoadingProjects = false;
         }
     }
 
@@ -79,6 +205,7 @@
             {
                 statusMessage = $"Successfully deployed project '{projectModel.Title}' into SQLite system storage.";
                 projectModel = new();
+                await LoadProjects();
             }
         }
         catch (Exception)
@@ -89,5 +216,88 @@
         {
             isSaving = false;
         }
+    }
+
+    private void OpenEditModal(ProjectSummary target)
+    {
+        editingId = target.Id;
+        // Map to a completely separate copy object instance so editing changes don't prematurely warp live previews
+        editingModel = new ProjectSummary
+        {
+            Id = target.Id,
+            Title = target.Title,
+            Description = target.Description,
+            TechStack = target.TechStack,
+            Url = target.Url
+        };
+        isModalOpen = true;
+    }
+
+    private void CloseEditModal()
+    {
+        isModalOpen = false;
+        editingModel = null;
+    }
+
+    private async Task UpdateProject()
+    {
+        if (editingModel == null) return;
+        isSaving = true;
+        statusMessage = string.Empty;
+
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Put, $"http://apiservice/api/projects/{editingId}");
+            request.Headers.Add("X-Admin-Token", AdminState.Token);
+            request.Content = JsonContent.Create(editingModel);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = $"Successfully updated project '{editingModel.Title}' details.";
+                CloseEditModal();
+                await LoadProjects(); // Re-sync view context
+            }
+        }
+        catch (Exception)
+        {
+            statusMessage = "Error pushing dataset updates to backend service.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task DeleteProject(int id, string title)
+    {
+        statusMessage = string.Empty;
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to permanently delete project '{title}'?");
+        if (!confirmed) return;
+
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Delete, $"http://apiservice/api/projects/{id}");
+            request.Headers.Add("X-Admin-Token", AdminState.Token);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = $"Successfully removed project '{title}' from live SQLite system storage.";
+                await LoadProjects();
+            }
+        }
+        catch (Exception)
+        {
+            statusMessage = "Network error: Failed to drop record row.";
+        }
+    }
+
+    private string FormatTechStack(string? rawTechStack)
+    {
+        if (string.IsNullOrWhiteSpace(rawTechStack)) return string.Empty;
+        var delimiters = new[] { ',', ';', '•' };
+        var parsedTags = rawTechStack.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Select(tag => tag.Trim()).Where(tag => !string.IsNullOrEmpty(tag));
+        return string.Join(" • ", parsedTags);
     }
 }

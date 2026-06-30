@@ -4,6 +4,7 @@
 @inject HttpClient Http
 @inject AdminStateProvider AdminState
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 @rendermode InteractiveServer
 
 <PageTitle>HQ Team Roster Management</PageTitle>
@@ -24,7 +25,7 @@
                 <div class="alert alert-success mb-4 text-center">@statusMessage</div>
             }
 
-            <div class="mgmt-card max-width-md">
+            <div class="mgmt-card max-width-md mb-5">
                 <h3>Provision Team Roster</h3>
                 <EditForm Model="@teamModel" OnValidSubmit="SubmitTeamMember" FormName="AddTeamForm">
                     <div class="mb-3">
@@ -46,20 +47,144 @@
                     <button type="submit" class="btn btn-primary w-100" disabled="@isSaving">Commit to Database</button>
                 </EditForm>
             </div>
+
+            <hr class="border-secondary my-5" style="opacity: 0.15;" />
+
+            <div class="preview-header mb-4">
+                <h2>Live Roster Preview</h2>
+                <p class="text-muted">Current profiles pulled dynamically from SQLite production storage.</p>
+            </div>
+
+            @if (isLoadingRoster)
+            {
+                <div class="text-muted py-3">
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span> Querying backend API dataset...
+                </div>
+            }
+            else if (existingRoster == null || !existingRoster.Any())
+            {
+                <div class="alert alert-info text-center py-4">
+                    💡 No active staff members provisioned inside the system index. Use the form above to add one.
+                </div>
+            }
+            else
+            {
+                <div class="dashboard-grid">
+                    @foreach (var member in existingRoster)
+                    {
+                        <div class="mgmt-card d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-dark border border-secondary text-light px-2.5 py-1.5" style="font-size: 0.75rem;">
+                                        ID: @member.Id
+                                    </span>
+                                    <button class="btn btn-sm btn-link text-gradient p-0 font-weight-bold text-decoration-none"
+                                            @onclick="() => OpenEditModal(member)">
+                                        ✏️ Edit Profile
+                                    </button>
+                                </div>
+
+                                <h4 class="text-white font-weight-bold mt-1 mb-1">@member.Name</h4>
+                                <div class="text-gradient font-weight-bold text-sm mb-3">@member.Role</div>
+                                <p class="text-muted text-sm mb-3" style="line-height: 1.6;">@member.Bio</p>
+
+                                <div class="font-monospace text-truncate p-2 rounded"
+                                     style="font-size: 0.8rem; background: #121212; border: 1px solid rgba(255, 255, 255, 0.12); color: #A0A0A0;">
+                                    📁 @member.ImagePath
+                                </div>
+                            </div>
+
+                            <div class="mt-3 border-top border-secondary pt-3 d-flex gap-2">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger w-100 py-2 font-weight-bold"
+                                        @onclick="() => DeleteTeamMember(member.Id, member.Name)">
+                                    🗑️ Deprovision Profile
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     }
 </div>
 
+@if (isModalOpen && editingModel != null)
+{
+    <div class="custom-modal-backdrop animate-fade-in" @onclick="CloseEditModal">
+        <div class="custom-modal-content" @onclick:stopPropagation>
+            <div class="custom-modal-header">
+                <h3>Update Roster Profile (ID: @editingId)</h3>
+                <button type="button" class="btn-close-modal" @onclick="CloseEditModal">&times;</button>
+            </div>
+            <div class="custom-modal-body">
+                <EditForm Model="@editingModel" OnValidSubmit="UpdateTeamMember" FormName="UpdateTeamForm">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" @bind-value="editingModel.Name" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Corporate Role</label>
+                        <input type="text" class="form-control" @bind-value="editingModel.Role" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Professional Bio</label>
+                        <textarea class="form-control" @bind="editingModel.Bio" required rows="3"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Avatar Asset Path</label>
+                        <input type="text" class="form-control" @bind-value="editingModel.ImagePath" required />
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary text-light w-50 py-2" @onclick="CloseEditModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary w-50 py-2" disabled="@isSaving">Save Changes</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private TeamMember teamModel = new();
+    private List<TeamMember>? existingRoster;
     private string statusMessage = string.Empty;
     private bool isSaving = false;
+    private bool isLoadingRoster = true;
 
-    protected override void OnAfterRender(bool firstRender)
+    // Modal Control Context Variables
+    private bool isModalOpen = false;
+    private int editingId;
+    private TeamMember? editingModel;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !AdminState.IsAuthenticated)
+        if (firstRender)
         {
-            Navigation.NavigateTo("/monarch-hq");
+            if (!AdminState.IsAuthenticated)
+            {
+                Navigation.NavigateTo("/monarch-hq");
+                return;
+            }
+            await LoadRoster();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadRoster()
+    {
+        isLoadingRoster = true;
+        try
+        {
+            existingRoster = await Http.GetFromJsonAsync<List<TeamMember>>("http://apiservice/api/team");
+        }
+        catch (Exception)
+        {
+            statusMessage = "Warning: Failed to fetch the current organizational team roster from the backend service.";
+        }
+        finally
+        {
+            isLoadingRoster = false;
         }
     }
 
@@ -79,6 +204,7 @@
             {
                 statusMessage = $"Successfully provisioned {teamModel.Name} to the live organizational roster.";
                 teamModel = new();
+                await LoadRoster(); // Live refresh preview matrix
             }
         }
         catch (Exception)
@@ -88,6 +214,81 @@
         finally
         {
             isSaving = false;
+        }
+    }
+
+    private void OpenEditModal(TeamMember target)
+    {
+        editingId = target.Id;
+        // Deep copy clone initialization to prevent visual input bleed bugs
+        editingModel = new TeamMember
+        {
+            Id = target.Id,
+            Name = target.Name,
+            Role = target.Role,
+            Bio = target.Bio,
+            ImagePath = target.ImagePath
+        };
+        isModalOpen = true;
+    }
+
+    private void CloseEditModal()
+    {
+        isModalOpen = false;
+        editingModel = null;
+    }
+
+    private async Task UpdateTeamMember()
+    {
+        if (editingModel == null) return;
+        isSaving = true;
+        statusMessage = string.Empty;
+
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Put, $"http://apiservice/api/team/{editingId}");
+            request.Headers.Add("X-Admin-Token", AdminState.Token);
+            request.Content = JsonContent.Create(editingModel);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = $"Successfully updated {editingModel.Name}'s corporate profile information.";
+                CloseEditModal();
+                await LoadRoster(); // Force layout sync
+            }
+        }
+        catch (Exception)
+        {
+            statusMessage = "Error pushing profile dataset updates to backend service.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task DeleteTeamMember(int id, string name)
+    {
+        statusMessage = string.Empty;
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to permanently remove {name} from the company roster?");
+        if (!confirmed) return;
+
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Delete, $"http://apiservice/api/team/{id}");
+            request.Headers.Add("X-Admin-Token", AdminState.Token);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = $"Successfully dropped {name} from active live database records.";
+                await LoadRoster();
+            }
+        }
+        catch (Exception)
+        {
+            statusMessage = "Network execution error: Failed to dispatch deletion command.";
         }
     }
 }
