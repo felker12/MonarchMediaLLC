@@ -43,7 +43,7 @@ public class MonarchDbContext : DbContext
                 Title = "Southard Homes",
                 Description = "A custom architectural web portal featuring high-performance image lightboxes and 2D/3D floorplan matrices.",
                 TechStack = "Astro • TS • Tailwind",
-                Url = "https://www.southardhomesllc.com/"
+                LiveUrl = "https://www.southardhomesllc.com/"
             },
             new ProjectSummary
             {
@@ -51,7 +51,7 @@ public class MonarchDbContext : DbContext
                 Title = "Quality Electric of Indiana",
                 Description = "Corporate communication platform optimizing structural local SEO and service maps for the Wabash Valley area.",
                 TechStack = "Astro • TS • Tailwind",
-                Url = "https://qualityelectricofindiana.com/"
+                LiveUrl = "https://qualityelectricofindiana.com/"
             }
         );
     }

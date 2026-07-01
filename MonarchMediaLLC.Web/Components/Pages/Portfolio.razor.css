@@ -1,0 +1,30 @@
+/* CSS for Portfolio component */
+.package-card {
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    background: #1E1E1E;
+    margin-bottom: 4rem;
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+
+/* HOVER ANIMATION ENGINE */
+    .package-card:hover {
+        border-color: rgba(155, 93, 229, 0.3);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 25px rgba(155, 93, 229, 0.05);
+    }
+
+        .package-card:hover .package-card-body h1 {
+            color: #9B5DE5;
+        }
+
+/* CTA */
+.cta-link-card {
+    display: flex;
+    margin-bottom: 2em;
+}
+
+.cta-body {
+    margin-left: 2em;
+}

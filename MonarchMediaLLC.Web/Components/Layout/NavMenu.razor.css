@@ -31,7 +31,7 @@
 }
 
     .nav-item ::deep a {
-        height: 52px;
+        height: 40px;
         display: flex;
         align-items: center;
         gap: .9rem;

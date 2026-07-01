@@ -5,7 +5,7 @@
 .about-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 3rem 1rem 5rem;
+    padding: 3rem 1rem 4rem;
     color: #D8D8D8;
     font-family: system-ui, -apple-system, sans-serif;
 }
@@ -27,38 +27,6 @@
     color: #A0A0A0;
     max-width: 720px;
     margin: 0 auto 3rem;
-}
-
-/* ============================================================
-   HERO
-============================================================ */
-
-.hero-section {
-    text-align: center;
-    padding: 4rem 0;
-}
-
-.hero-title {
-    font-size: clamp(2.6rem, 6vw, 3.8rem);
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.1;
-    margin-bottom: 1.5rem;
-    letter-spacing: -.04em;
-}
-
-.text-coloring {
-    color: #9B5DE5;
-    text-shadow: 0 0 25px rgba(155,93,229,.35);
-}
-
-.hero-subtitle {
-    max-width: 800px;
-    margin: 0 auto;
-    padding-bottom: .75rem;
-    font-size: 1.2rem;
-    line-height: 1.7;
-    color: #A0A0A0;
 }
 
 /* ============================================================
@@ -388,18 +356,6 @@
 }
 
 @media (max-width: 768px) {
-
-    .hero-section {
-        padding: 3rem 0;
-    }
-
-    .section-title {
-        font-size: 2rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.05rem;
-    }
 
     .values-grid,
     .principles-grid,

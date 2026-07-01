@@ -107,8 +107,16 @@ app.MapPut("/api/projects/{id:int}", async (int id, ProjectSummary updatedProjec
     existingProject.Title = updatedProject.Title;
     existingProject.Description = updatedProject.Description;
     existingProject.TechStack = updatedProject.TechStack;
-    existingProject.Url = updatedProject.Url;
+    existingProject.LiveUrl = updatedProject.LiveUrl;
     existingProject.ImagePath = updatedProject.ImagePath;
+    existingProject.ImageAlt = updatedProject.ImageAlt;
+    existingProject.Package = updatedProject.Package;
+    existingProject.Featured = updatedProject.Featured;
+    existingProject.DisplayOrder = updatedProject.DisplayOrder;
+    existingProject.CompletedOn = updatedProject.CompletedOn;
+    existingProject.IsPublic = updatedProject.IsPublic;
+    existingProject.Industry = updatedProject.Industry;
+    existingProject.ClientName = updatedProject.ClientName;
 
     await db.SaveChangesAsync();
     return Results.NoContent(); // 204 Standard success response for updates

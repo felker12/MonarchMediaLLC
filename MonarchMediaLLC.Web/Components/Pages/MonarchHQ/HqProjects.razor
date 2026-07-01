@@ -16,7 +16,7 @@
             <header class="dashboard-header mb-4">
                 <div>
                     <h1>Project Management Operations</h1>
-                    <p>Deploy and initialize application portfolio cards into SQLite production storage.</p>
+                    <p>Deploy and initialize expanded portfolio cards into SQLite production storage.</p>
                 </div>
             </header>
 
@@ -28,104 +28,153 @@
             <div class="mgmt-card max-width-md mb-5">
                 <h3>Deploy New Project Card</h3>
                 <EditForm Model="@projectModel" OnValidSubmit="SubmitProject" FormName="AddProjectForm">
-                    <div class="mb-3">
-                        <label class="form-label">Project Title</label>
-                        <input type="text" class="form-control" @bind-value="projectModel.Title" required placeholder="e.g., Southard Homes" />
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Project Title</label>
+                            <input type="text" class="form-control" @bind-value="projectModel.Title" required placeholder="e.g., Quality Electric" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Client Name</label>
+                            <input type="text" class="form-control" @bind-value="projectModel.ClientName" placeholder="Legal corporate entity name" />
+                        </div>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea class="form-control" @bind="projectModel.Description" required rows="3" placeholder="Brief platform summary..."></textarea>
+                        <textarea class="form-control" @bind="projectModel.Description" required rows="2" placeholder="Brief platform summary..."></textarea>
                     </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Industry Sector</label>
+                            <InputSelect class="form-control" @bind-value="projectModel.Industry">
+                                @foreach (var ind in Enum.GetValues<Industry>())
+                                {
+                                    <option value="@ind">@ind</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Package Tier</label>
+                            <InputSelect class="form-control" @bind-value="projectModel.Package">
+                                @foreach (var pkg in Enum.GetValues<PackageType>())
+                                {
+                                    <option value="@pkg">@pkg</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label">Tech Stack Tags</label>
-                        <input type="text" class="form-control" @bind-value="projectModel.TechStack" required placeholder="e.g., Astro, TS, Tailwind" />
+                        <input type="text" class="form-control" @bind-value="projectModel.TechStack" required placeholder="Astro, TS, Tailwind" />
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Launch URL</label>
-                        <input type="url" class="form-control" @bind-value="projectModel.Url" required placeholder="https://..." />
+                        <input type="url" class="form-control" @bind-value="projectModel.LiveUrl" required placeholder="https://..." />
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label">Project Preview Image Path</label>
-                        <input type="text" class="form-control" @bind-value="projectModel.ImagePath" required placeholder="images/projects/preview.jpg" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Image Asset Path</label>
+                            <input type="text" class="form-control" @bind-value="projectModel.ImagePath" required placeholder="images/mockups/site.jpg" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Image Alt Text</label>
+                            <input type="text" class="form-control" @bind-value="projectModel.ImageAlt" required placeholder="Desktop screenshot display" />
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100" disabled="@isSaving">Commit to Database</button>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Display Sorting Order</label>
+                            <input type="number" class="form-control" @bind-value="projectModel.DisplayOrder" required min="0" placeholder="0 (First), 1, 2..." />
+                            <small class="text-muted text-xs">Lower numbers sort to the top of the public view portfolio.</small>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-4 pt-2">
+                        <div class="col-6 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="addFeatured" @bind="projectModel.Featured">
+                                <label class="form-check-label text-white ps-2" for="addFeatured">⭐ Featured Showcase</label>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="addPublic" @bind="projectModel.IsPublic">
+                                <label class="form-check-label text-white ps-2" for="addPublic">🌐 Publicly Visible</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" disabled="@isSaving">Commit New Project</button>
                 </EditForm>
             </div>
 
             <hr class="border-secondary my-5" style="opacity: 0.15;" />
 
             <div class="preview-header mb-4">
-                <h2>Live Database Preview</h2>
-                <p>Current items pulled dynamically from SQLite production storage.</p>
+                <h2>Live Portfolio Entries</h2>
             </div>
 
             @if (isLoadingProjects)
             {
                 <div class="text-muted py-3">
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span> Querying backend API data...
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span> Querying database records...
                 </div>
             }
             else if (existingProjects == null || !existingProjects.Any())
             {
-                <div class="alert alert-info text-center py-4">
-                    💡 No project entries found in the database. Use the form above to deploy your first card.
-                </div>
+                <div class="alert alert-info text-center py-4">💡 No records found.</div>
             }
             else
             {
                 <div class="dashboard-grid">
-                    @foreach (var project in existingProjects)
+                    @foreach (var project in existingProjects.OrderBy(p => p.DisplayOrder))
                     {
                         <div class="mgmt-card d-flex flex-column justify-content-between">
                             <div>
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="badge bg-dark border border-secondary text-light px-2.5 py-1.5" style="font-size: 0.75rem;">
-                                        ID: @project.Id
-                                    </span>
+                                    <div class="d-flex gap-1.5 align-items-center">
+                                        <span class="badge bg-dark border border-secondary text-light">ID: @project.Id</span>
+                                        @if (project.Featured)
+                                        {
+                                            <span class="badge bg-warning text-dark">Featured</span>
+                                        }
+                                        @if (!project.IsPublic)
+                                        {
+                                            <span class="badge bg-danger text-light">Hidden</span>
+                                        }
+                                    </div>
                                     <button class="btn btn-sm btn-link text-gradient p-0 font-weight-bold text-decoration-none"
                                             @onclick="() => OpenEditModal(project)">
                                         ✏️ Edit Card
                                     </button>
                                 </div>
-                                <h4 class="text-white font-weight-bold mt-1 mb-2">@project.Title</h4>
+                                <h4 class="text-white font-weight-bold mt-1 mb-1">@project.Title</h4>
+                                <div class="text-xs text-muted mb-2">Industry: <b class="text-light">@project.Industry</b> | Tier: <b class="text-light">@project.Package</b></div>
                                 <p class="text-muted text-sm mb-3">@project.Description</p>
 
                                 <div class="tech-stack-wrapper mb-3 text-gradient font-weight-bold text-sm">
                                     🛠️ @FormatTechStack(project.TechStack)
                                 </div>
 
-                                <div class="font-monospace text-truncate p-2 rounded mb-3"
-                                     style="font-size: 0.8rem; background: #121212; border: 1px solid rgba(255, 255, 255, 0.12); color: #A0A0A0;">
-                                    📁 @project.ImagePath
-                                </div>
-
-                                <!-- SITE RENDER VISUAL PREVIEW BOX -->
                                 <div class="text-center d-flex align-items-center justify-content-center bg-dark rounded border border-secondary"
-                                     style="height: 160px; background: #121212 !important; border-color: rgba(255, 255, 255, 0.06) !important; overflow: hidden;">
+                                     style="height: 140px; background: #121212 !important; border-color: rgba(255, 255, 255, 0.06) !important; overflow: hidden;">
                                     @if (!string.IsNullOrWhiteSpace(project.ImagePath))
                                     {
-                                        <img src="@project.ImagePath"
-                                             alt="Platform mock visual asset layout"
-                                             class="img-fluid h-100 w-100"
-                                             style="object-fit: cover;" />
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted text-xs">No image asset specified</span>
+                                        <img src="@project.ImagePath" alt="@project.ImageAlt" class="img-fluid h-100 w-100" style="object-fit: cover;" />
                                     }
                                 </div>
                             </div>
 
                             <div class="mt-3 border-top border-secondary pt-3 d-flex gap-2">
-                                <a href="@project.Url" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary text-light flex-grow-1 py-2">
-                                    Visit Live Deployment ↗
+                                <a href="@project.LiveUrl" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary text-light flex-grow-1 py-2">
+                                    Launch Site ↗
                                 </a>
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-danger px-3 d-flex align-items-center justify-content-center"
-                                        @onclick="() => DeleteProject(project.Id, project.Title)"
-                                        aria-label="Delete Project">
-                                    🗑️
-                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger px-3" @onclick="() => DeleteProject(project.Id, project.Title)">🗑️</button>
                             </div>
                         </div>
                     }
@@ -138,33 +187,93 @@
 @if (isModalOpen && editingModel != null)
 {
     <div class="custom-modal-backdrop animate-fade-in" @onclick="CloseEditModal">
-        <div class="custom-modal-content" @onclick:stopPropagation>
+        <div class="custom-modal-content" @onclick:stopPropagation style="max-width:650px;">
             <div class="custom-modal-header">
                 <h3>Update Portfolio Card (ID: @editingId)</h3>
                 <button type="button" class="btn-close-modal" @onclick="CloseEditModal">&times;</button>
             </div>
             <div class="custom-modal-body">
                 <EditForm Model="@editingModel" OnValidSubmit="UpdateProject" FormName="UpdateProjectForm">
-                    <div class="mb-3">
-                        <label class="form-label">Project Title</label>
-                        <input type="text" class="form-control" @bind-value="editingModel.Title" required />
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" @bind-value="editingModel.Title" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Client Name</label>
+                            <input type="text" class="form-control" @bind-value="editingModel.ClientName" />
+                        </div>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea class="form-control" @bind="editingModel.Description" required rows="3"></textarea>
+                        <textarea class="form-control" @bind="editingModel.Description" required rows="2"></textarea>
                     </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Industry</label>
+                            <InputSelect class="form-control" @bind-value="editingModel.Industry">
+                                @foreach (var ind in Enum.GetValues<Industry>())
+                                {
+                                    <option value="@ind">@ind</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Package</label>
+                            <InputSelect class="form-control" @bind-value="editingModel.Package">
+                                @foreach (var pkg in Enum.GetValues<PackageType>())
+                                {
+                                    <option value="@pkg">@pkg</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label">Tech Stack Tags</label>
                         <input type="text" class="form-control" @bind-value="editingModel.TechStack" required />
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Launch URL</label>
-                        <input type="url" class="form-control" @bind-value="editingModel.Url" required />
+                        <label class="form-label">Live URL</label>
+                        <input type="url" class="form-control" @bind-value="editingModel.LiveUrl" required />
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label">Project Preview Image Path</label>
-                        <input type="text" class="form-control" @bind-value="editingModel.ImagePath" required />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Image Path</label>
+                            <input type="text" class="form-control" @bind-value="editingModel.ImagePath" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Image Alt</label>
+                            <input type="text" class="form-control" @bind-value="editingModel.ImageAlt" required />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Display Sorting Order</label>
+                                <input type="number" class="form-control" @bind-value="editingModel.DisplayOrder" required min="0" />
+                            </div>
+                        </div>
                     </div>
+
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editFeatured" @bind="editingModel.Featured">
+                                <label class="form-check-label text-white" for="editFeatured">⭐ Featured</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editPublic" @bind="editingModel.IsPublic">
+                                <label class="form-check-label text-white" for="editPublic">🌐 Visible</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-outline-secondary text-light w-50 py-2" @onclick="CloseEditModal">Cancel</button>
                         <button type="submit" class="btn btn-primary w-50 py-2" disabled="@isSaving">Save Changes</button>
@@ -209,7 +318,7 @@
         }
         catch (Exception)
         {
-            statusMessage = "Warning: Failed to fetch existing portfolio items from backend engine.";
+            statusMessage = "Warning: Failed to fetch data records from backend service.";
         }
         finally
         {
@@ -221,7 +330,6 @@
     {
         isSaving = true;
         statusMessage = string.Empty;
-
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Post, "http://apiservice/api/projects");
@@ -231,14 +339,14 @@
             var response = await Http.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                statusMessage = $"Successfully deployed project '{projectModel.Title}' into SQLite system storage.";
+                statusMessage = $"Successfully deployed project '{projectModel.Title}'.";
                 projectModel = new();
                 await LoadProjects();
             }
         }
         catch (Exception)
         {
-            statusMessage = "Error updating backend database records.";
+            statusMessage = "Error updating backend records.";
         }
         finally
         {
@@ -253,10 +361,17 @@
         {
             Id = target.Id,
             Title = target.Title,
+            ClientName = target.ClientName,
             Description = target.Description,
             TechStack = target.TechStack,
-            Url = target.Url,
-            ImagePath = target.ImagePath // <-- Include field mappings inside modal clones
+            LiveUrl = target.LiveUrl,
+            ImagePath = target.ImagePath,
+            ImageAlt = target.ImageAlt,
+            Industry = target.Industry,
+            Package = target.Package,
+            Featured = target.Featured,
+            IsPublic = target.IsPublic,
+            DisplayOrder = target.DisplayOrder
         };
         isModalOpen = true;
     }
@@ -272,7 +387,6 @@
         if (editingModel == null) return;
         isSaving = true;
         statusMessage = string.Empty;
-
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Put, $"http://apiservice/api/projects/{editingId}");
@@ -282,14 +396,14 @@
             var response = await Http.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                statusMessage = $"Successfully updated project '{editingModel.Title}' details.";
+                statusMessage = $"Successfully updated '{editingModel.Title}'.";
                 CloseEditModal();
                 await LoadProjects();
             }
         }
         catch (Exception)
         {
-            statusMessage = "Error pushing dataset updates to backend service.";
+            statusMessage = "Error pushing updates to server.";
         }
         finally
         {
@@ -300,7 +414,7 @@
     private async Task DeleteProject(int id, string title)
     {
         statusMessage = string.Empty;
-        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to permanently delete project '{title}'?");
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Permanently wipe out '{title}'?");
         if (!confirmed) return;
 
         try
@@ -311,13 +425,13 @@
             var response = await Http.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                statusMessage = $"Successfully removed project '{title}' from live SQLite system storage.";
+                statusMessage = $"Successfully dropped '{title}'.";
                 await LoadProjects();
             }
         }
         catch (Exception)
         {
-            statusMessage = "Network error: Failed to drop record row.";
+            statusMessage = "Network error dropping target item row.";
         }
     }
 

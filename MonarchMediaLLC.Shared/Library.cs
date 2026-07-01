@@ -1,5 +1,22 @@
 ﻿namespace MonarchMediaLLC.Shared
 {
+    public enum PackageType
+    {
+        Core,
+        Professional,
+        Premium
+    }
+
+    public enum Industry
+    {
+        General, 
+        Construction, 
+        Landscaping,
+        Restaurant, 
+        Healthcare,
+        LawFirm,
+    }
+
     public class TeamMember
     {
         public int Id { get; set; }
@@ -15,8 +32,16 @@
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string TechStack { get; set; } = string.Empty;
-        public string Url { get; set; } = string.Empty;
+        public string LiveUrl { get; set; } = string.Empty;
         public string ImagePath { get; set; } = string.Empty;
+        public string ImageAlt { get; set; } = string.Empty;
+        public PackageType Package { get; set; } = PackageType.Core;
+        public bool Featured { get; set; } = false;
+        public int DisplayOrder { get; set; } = 0;
+        public DateOnly CompletedOn { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+        public bool IsPublic { get; set; } = true;
+        public Industry Industry { get; set; } = Industry.General;
+        public string ClientName { get; set; } = string.Empty;
     }
 
     public class AdminLoginRequest

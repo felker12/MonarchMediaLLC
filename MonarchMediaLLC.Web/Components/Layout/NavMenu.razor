@@ -45,7 +45,6 @@
                     </button>
                 </div>
             }
-
         </nav>
     </div>
 </div>
@@ -75,8 +74,8 @@
     {
         new NavLinkItem { Href = "", Label = "Home", Match = NavLinkMatch.All, IconPath = "icons/house-door-fill.svg" },
         new NavLinkItem { Href = "about", Label = "About", IconPath = "icons/file-person-fill.svg" },
-        new NavLinkItem { Href = "project-overview", Label = "Project Overview", IconPath = "icons/list-task.svg" },
-        new NavLinkItem { Href = "projects", Label = "Projects", IconPath = "icons/folder-fill.svg" },
+        new NavLinkItem { Href = "portfolio", Label = "Portfolio", IconPath = "icons/list-task.svg" },
+        new NavLinkItem { Href = "packages", Label = "Packages", IconPath = "icons/folder-fill.svg" },
         new NavLinkItem { Href = "contact", Label = "Contact", IconPath = "icons/chat-left-text.svg" },
     };
 
@@ -108,6 +107,15 @@
                     Href = "monarch-hq/team",
                     Label = "Manage Team",
                     IconPath = "icons/people-fill.svg"
+                });
+            }
+            else
+            {
+                links.Add(new NavLinkItem
+                {
+                    Href = "monarch-hq",
+                    Label = "Admin",
+                    IconPath = "icons/file-lock.svg"
                 });
             }
 

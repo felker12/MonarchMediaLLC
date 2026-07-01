@@ -1,0 +1,151 @@
+﻿@page "/portfolio"
+@using MonarchMediaLLC.Shared
+@inject HttpClient Http
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="badge-container">
+        <span class="status-badge">Monarch Media LLC Portfolio</span>
+    </div>
+
+    <h1 class="hero-title">
+        Websites Built To
+        <br />
+        <span class="text-gradient">Perform</span>
+    </h1>
+
+    <p class="hero-subtitle">
+        Every project is designed around the client's business,
+        goals, and audience.
+    </p>
+
+    <!-- TODO: this is temporary -->
+    <span>
+        Total projects: @(existingProjects?.Count ?? 0)
+    </span>
+</section>
+
+<!-- Package Section -->
+<section>
+    <!-- Premium Package -->
+    <div class="package-card">
+        <!-- Package Header -->
+        <div class="package-card-body">
+            <h1>Premium Package</h1>
+            <span>
+                Enterprise-grade websites and web applications built for 
+                businesses that demand maximum performance and scalability.
+            </span>
+        </div>
+        <!-- Site 1 -->
+        <div>
+
+        </div>
+        <!-- Site 2 -->
+        <div>
+
+        </div>
+    </div>
+
+    <!-- Professional Package -->
+    <div class="package-card">
+        <!-- Package Header -->
+        <div class="package-card-body">
+            <h1>Professinal Package</h1>
+            <span>Designed for growing companies that need custom functionality and a polished brand experience.</span>
+        </div>
+        <!-- Site 1 -->
+        <div>
+
+        </div>
+        <!-- Site 2 -->
+        <div>
+
+        </div>
+    </div>
+
+    <!-- Core Package -->
+    <div class="package-card">
+        <!-- Package Header -->
+        <div class="package-card-body">
+            <h1>Core Package</h1>
+            <span>3 page site with a contact form and meta data for Search Engine Optimization (SEO)<br /> </span>
+            <span>Perfect for local businesses establishing a strong online presence.</span>
+        </div>
+        <!-- Site 1 -->
+        <div>
+
+        </div>
+        <!-- Site 2 -->
+        <div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Bottom Section -->
+<section>
+
+    <!-- link to packages page (not made yet)  -->
+    <div class="cta-body">
+        <p>
+            Not sure which package fits your business?<br />
+            <br />
+            Compare features,<br />
+            pricing,<br />
+            and recommendations.<br />
+        </p>
+
+        <div class="cta-link-card">
+            <NavLink class="btn btn-primary"
+                     href="/packages">
+                View Website Packages
+            </NavLink>
+        </div>
+
+        <p>
+            Ready to build something amazing?<br />
+            <br />
+            Let's talk about your project.<br />
+        </p>    
+
+        <div class="cta-link-card">
+            <NavLink class="btn btn-primary"
+                     href="/contact">
+                Start Your Project
+            </NavLink>
+        </div>
+    </div>
+</section>
+
+@code {
+    private bool isLoadingProjects = true;
+    private List<ProjectSummary>? existingProjects;
+    private string statusMessage = string.Empty;
+
+    private async Task LoadProjects()
+    {
+        isLoadingProjects = true;
+        try
+        {
+            existingProjects = await Http.GetFromJsonAsync<List<ProjectSummary>>("http://apiservice/api/projects");
+        }
+        catch (Exception)
+        {
+            statusMessage = "Warning: Failed to fetch existing portfolio items from backend engine.";
+        }
+        finally
+        {
+            isLoadingProjects = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadProjects();
+            StateHasChanged();
+        }
+    }
+}
