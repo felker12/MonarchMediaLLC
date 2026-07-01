@@ -16,6 +16,7 @@
         public string Description { get; set; } = string.Empty;
         public string TechStack { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
+        public string ImagePath { get; set; } = string.Empty;
     }
 
     public class AdminLoginRequest

@@ -90,24 +90,25 @@ app.MapDelete("/api/projects/{id:int}", async (int id, HttpRequest request, Mona
     return Results.NoContent(); // Standard REST 204 response code for successful delete actions
 });
 
-// Admin endpoint to update an existing project
+//Admin endpoint to update an existing project
 app.MapPut("/api/projects/{id:int}", async (int id, ProjectSummary updatedProject, HttpRequest request, MonarchDbContext db, IConfiguration config) =>
 {
-    // 1. Verify incoming administrative authorization token header
+    //Verify incoming administrative authorization token header
     var token = request.Headers["X-Admin-Token"].ToString();
     if (token != config["AdminSettings:SecretPasskey"])
         return Results.Unauthorized();
 
-    // 2. Locate targeted database record
+    //Locate targeted database record
     var existingProject = await db.ProjectSummaries.FindAsync(id);
     if (existingProject == null)
         return Results.NotFound(new { Message = $"Project target index {id} does not exist inside storage." });
 
-    // 3. Mutate table properties safely
+    //Mutate table properties safely
     existingProject.Title = updatedProject.Title;
     existingProject.Description = updatedProject.Description;
     existingProject.TechStack = updatedProject.TechStack;
     existingProject.Url = updatedProject.Url;
+    existingProject.ImagePath = updatedProject.ImagePath;
 
     await db.SaveChangesAsync();
     return Results.NoContent(); // 204 Standard success response for updates
