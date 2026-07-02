@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Net.Http.Json;
 using MonarchMediaLLC.Shared;
 using MonarchMediaLLC.Web.Services;
 
@@ -17,6 +16,18 @@ namespace MonarchMediaLLC.Web.Components.Pages.MonarchHQ
         [Inject] private IJSRuntime JS { get; set; } = default!;
 
         // ==========================================================
+        // Other Variables
+        // ==========================================================
+        private bool isEditModalOpen;
+
+        private ProjectSummary? editProject;
+
+        // ==========================================================
+        // API ENDPOINTS
+        // ==========================================================
+        private const string ProjectApi = "http://apiservice/api/projects";
+
+        // ==========================================================
         // BACKEND STATE DATA MATRIX BOUNDS
         // ==========================================================
         private ProjectSummary projectModel = new();
@@ -24,11 +35,6 @@ namespace MonarchMediaLLC.Web.Components.Pages.MonarchHQ
         private string statusMessage = string.Empty;
         private bool isSaving = false;
         private bool isLoadingProjects = true;
-
-        // Modal Control State variables
-        private bool isModalOpen = false;
-        private int editingId;
-        private ProjectSummary? editingModel;
 
         // ==========================================================
         // BLAZOR COMPONENT LIFECYCLE INITIALIZATION
@@ -59,7 +65,9 @@ namespace MonarchMediaLLC.Web.Components.Pages.MonarchHQ
             isLoadingProjects = true;
             try
             {
-                existingProjects = await Http.GetFromJsonAsync<List<ProjectSummary>>("http://apiservice/api/projects");
+                existingProjects = (await Http.GetFromJsonAsync<List<ProjectSummary>>(ProjectApi))
+                    ?.OrderBy(p => p.DisplayOrder)
+                    .ToList();
             }
             catch (Exception)
             {
@@ -81,9 +89,7 @@ namespace MonarchMediaLLC.Web.Components.Pages.MonarchHQ
 
             try
             {
-                using var request = new HttpRequestMessage(HttpMethod.Post, "http://apiservice/api/projects");
-                request.Headers.Add("X-Admin-Token", AdminState.Token);
-                request.Content = JsonContent.Create(projectModel);
+                using var request = CreateAuthorizedRequest(HttpMethod.Post, ProjectApi, projectModel);
 
                 var response = await Http.SendAsync(request);
                 if (response.IsSuccessStatusCode)
@@ -104,51 +110,19 @@ namespace MonarchMediaLLC.Web.Components.Pages.MonarchHQ
         }
 
         /// <summary>
-        /// Commits mutated changes from inside the tracking update instance back into live application persistence.
-        /// </summary>
-        private async Task UpdateProject()
-        {
-            if (editingModel == null) return;
-            isSaving = true;
-            statusMessage = string.Empty;
-
-            try
-            {
-                using var request = new HttpRequestMessage(HttpMethod.Put, $"http://apiservice/api/projects/{editingId}");
-                request.Headers.Add("X-Admin-Token", AdminState.Token);
-                request.Content = JsonContent.Create(editingModel);
-
-                var response = await Http.SendAsync(request);
-                if (response.IsSuccessStatusCode)
-                {
-                    statusMessage = $"Successfully updated project '{editingModel.Title}' details.";
-                    CloseEditModal();
-                    await LoadProjects(); // Re-sync view context
-                }
-            }
-            catch (Exception)
-            {
-                statusMessage = "Error pushing dataset updates to backend service.";
-            }
-            finally
-            {
-                isSaving = false;
-            }
-        }
-
-        /// <summary>
         /// Executes a database target row eviction request after receiving manual verification.
         /// </summary>
         private async Task DeleteProject(int id, string title)
         {
             statusMessage = string.Empty;
             bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to permanently delete project '{title}'?");
+
             if (!confirmed) return;
 
             try
             {
-                using var request = new HttpRequestMessage(HttpMethod.Delete, $"http://apiservice/api/projects/{id}");
-                request.Headers.Add("X-Admin-Token", AdminState.Token);
+                using var request = CreateAuthorizedRequest(
+                    HttpMethod.Delete, $"{ProjectApi}/{id}");
 
                 var response = await Http.SendAsync(request);
                 if (response.IsSuccessStatusCode)
@@ -166,39 +140,52 @@ namespace MonarchMediaLLC.Web.Components.Pages.MonarchHQ
         // ==========================================================
         // INTERACTION UI OPERATIONS & WINDOW LAYER CONTROLS
         // ==========================================================
-        private void OpenEditModal(ProjectSummary target)
+        private void OpenEditModal(ProjectSummary project)
         {
-            editingId = target.Id;
-            // Fully map all fields to prevent structural properties from dropping on edit form init
-            editingModel = new ProjectSummary
-            {
-                Id = target.Id,
-                Title = target.Title,
-                ClientName = target.ClientName,
-                Description = target.Description,
-                TechStack = target.TechStack,
-                LiveUrl = target.LiveUrl,
-                ImagePath = target.ImagePath,
-                ImageAlt = target.ImageAlt,
-                Industry = target.Industry,
-                Package = target.Package,
-                Featured = target.Featured,
-                IsPublic = target.IsPublic,
-                DisplayOrder = target.DisplayOrder
-            };
-            isModalOpen = true;
+            editProject = new ProjectSummary(project);
+            isEditModalOpen = true;
         }
 
         private void CloseEditModal()
         {
-            isModalOpen = false;
-            editingModel = null;
+            isEditModalOpen = false;
+            editProject = null;
+        }
+
+        private async Task SaveProjectChanges(ProjectSummary project)
+        {
+            isSaving = true;
+
+            try
+            {
+                using var request = CreateAuthorizedRequest(
+                    HttpMethod.Put, $"{ProjectApi}/{project.Id}", project);
+
+                var response = await Http.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    statusMessage = $"Updated '{project.Title}' successfully.";
+
+                    CloseEditModal();
+
+                    await LoadProjects();
+                }
+            }
+            catch
+            {
+                statusMessage = "Failed to update project.";
+            }
+            finally
+            {
+                isSaving = false;
+            }
         }
 
         // ==========================================================
         // UTILITY UTTERANCE & FORMATTING HELPERS
         // ==========================================================
-        private string FormatTechStack(string? rawTechStack)
+        private static string FormatTechStack(string? rawTechStack)
         {
             if (string.IsNullOrWhiteSpace(rawTechStack)) return string.Empty;
             var delimiters = new[] { ',', ';', '•' };
@@ -206,6 +193,21 @@ namespace MonarchMediaLLC.Web.Components.Pages.MonarchHQ
                                         .Select(tag => tag.Trim())
                                         .Where(tag => !string.IsNullOrEmpty(tag));
             return string.Join(" • ", parsedTags);
+        }
+
+        private HttpRequestMessage CreateAuthorizedRequest(
+            HttpMethod method,
+            string url,
+            object? body = null)
+        {
+            var request = new HttpRequestMessage(method, url);
+
+            request.Headers.Add("X-Admin-Token", AdminState.Token);
+
+            if (body is not null)
+                request.Content = JsonContent.Create(body);
+
+            return request;
         }
     }
 }

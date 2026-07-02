@@ -9,6 +9,9 @@
     {
         <div class="dashboard-wrapper animate-fade-in">
 
+            @* ============================================================
+               PAGE HEADER
+            ============================================================ *@
             <header class="dashboard-header mb-4">
                 <div>
                     <h1>Project Management Operations</h1>
@@ -16,15 +19,26 @@
                 </div>
             </header>
 
+            @* ==============Status Message============== *@
             @if (!string.IsNullOrEmpty(statusMessage))
             {
                 <div class="alert alert-success mb-4 text-center">@statusMessage</div>
             }
 
+            <!-- Modal Edit From -->
+            <EditProjectModal IsVisible="@isEditModalOpen"
+                              Project="@editProject"
+                              OnSave="SaveProjectChanges"
+                              OnCancel="CloseEditModal" />
+
+            @* ====================================================
+               CREATE PROJECT
+            ==================================================== *@
             <div class="mgmt-card max-width-md mb-5">
-                <h3>Deploy New Project Card</h3>
+                <h3>Create Project</h3>
                 <EditForm Model="@projectModel" OnValidSubmit="SubmitProject" FormName="AddProjectForm">
 
+                    @* ==============Basic Info============== *@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Project Title</label>
@@ -36,11 +50,13 @@
                         </div>
                     </div>
 
+                    @* ==============Description============== *@
                     <div class="mb-3">
                         <label class="form-label">Description</label>
                         <textarea class="form-control" @bind="projectModel.Description" required rows="2" placeholder="Brief platform summary..."></textarea>
                     </div>
 
+                    @* ==============Classification============== *@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Industry Sector</label>
@@ -62,16 +78,21 @@
                         </div>
                     </div>
 
+                    @* ==============Tech Info============== *@
                     <div class="mb-3">
                         <label class="form-label">Tech Stack Tags</label>
                         <input type="text" class="form-control" @bind-value="projectModel.TechStack" required placeholder="Astro, TS, Tailwind" />
                     </div>
 
+                    
+                    @* ==============URL============== *@
                     <div class="mb-3">
                         <label class="form-label">Launch URL</label>
                         <input type="url" class="form-control" @bind-value="projectModel.LiveUrl" required placeholder="https://..." />
                     </div>
 
+                    
+                    @* ==============Image Info============== *@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Image Asset Path</label>
@@ -83,6 +104,8 @@
                         </div>
                     </div>
 
+                    
+                    @* ==============Display Options============== *@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Display Sorting Order</label>
@@ -105,17 +128,24 @@
                             </div>
                         </div>
                     </div>
-
-                    <button type="submit" class="btn btn-primary w-100" disabled="@isSaving">Commit New Project</button>
+                    
+                    @* ==============Submit Button============== *@
+                    <button type="submit" class="btn btn-primary w-100" disabled="@isSaving">Create Project</button>
                 </EditForm>
             </div>
 
             <hr class="border-secondary my-5" style="opacity: 0.15;" />
 
             <div class="preview-header mb-4">
-                <h2>Live Portfolio Entries</h2>
+                <h2>Project Library</h2>
             </div>
 
+            @* ====================================================
+               PROJECT DATABASE PREVIEW
+               Live records pulled directly from SQLite.
+            ==================================================== *@
+            
+            @* ==============Loading Message============== *@
             @if (isLoadingProjects)
             {
                 <div class="text-muted py-3">
@@ -124,15 +154,18 @@
             }
             else if (existingProjects == null || !existingProjects.Any())
             {
-                <div class="alert alert-info text-center py-4">💡 No records found.</div>
+                <div class="alert alert-info text-center py-4">No records found.</div>
             }
             else
             {
+                @* ==============Project Cards============== *@
                 <div class="dashboard-grid">
-                    @foreach (var project in existingProjects.OrderBy(p => p.DisplayOrder))
+                    @foreach (var project in existingProjects)
                     {
+                        @* ==============Individual Project Card============== *@
                         <div class="mgmt-card d-flex flex-column justify-content-between">
                             <div>
+                                @* Header *@
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div class="d-flex align-items-center">
                                         <span class="badge bg-dark border border-secondary text-light">
@@ -149,6 +182,7 @@
                                     </button>
                                 </div>
 
+                                @* Featured / Hidden badges *@
                                 @if (project.Featured || !project.IsPublic)
                                 {
                                     <div class="mb-2">
@@ -169,6 +203,7 @@
                                     </div>
                                 }
 
+                                @* Project Details *@
                                 <h4 class="text-white font-weight-bold mt-1 mb-1">@project.Title</h4>
                                 <div class="text-xs mb-2 bold">
                                     Industry: <b class="text-light">
@@ -177,10 +212,12 @@
                                 </div>
                                 <p class="text-muted text-sm mb-3">@project.Description</p>
 
+                                @* Tech Stack *@
                                 <div class="tech-stack-wrapper mb-3 text-gradient font-weight-bold text-sm">
                                     🛠️ @FormatTechStack(project.TechStack)
                                 </div>
 
+                                @* Screenshot Preview *@        
                                 <div class="text-center d-flex align-items-center justify-content-center bg-dark rounded border border-secondary"
                                      style="height: 140px; background: #121212 !important; border-color: rgba(255, 255, 255, 0.06) !important; overflow: hidden;">
                                     @if (!string.IsNullOrWhiteSpace(project.ImagePath))
@@ -190,6 +227,7 @@
                                 </div>
                             </div>
 
+                            @* Action Buttons *@
                             <div class="mt-3 border-top border-secondary pt-3 d-flex gap-2">
                                 <a href="@project.LiveUrl" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary text-light flex-grow-1 py-2">
                                     Launch Site ↗
@@ -203,106 +241,3 @@
         </div>
     }
 </div>
-
-@if (isModalOpen && editingModel != null)
-{
-    <div class="custom-modal-backdrop animate-fade-in" @onclick="CloseEditModal">
-        <div class="custom-modal-content" @onclick:stopPropagation style="max-width:650px;">
-
-            <div class="custom-modal-header">
-                <h3>Update Portfolio Card (ID: @editingId)</h3>
-                <button type="button" class="btn-close-modal" @onclick="CloseEditModal">&times;</button>
-            </div>
-
-            <div class="custom-modal-body">
-                <EditForm Model="@editingModel" OnValidSubmit="UpdateProject" FormName="UpdateProjectForm">
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" class="form-control" @bind-value="editingModel.Title" required />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Client Name</label>
-                            <input type="text" class="form-control" @bind-value="editingModel.ClientName" />
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" @bind="editingModel.Description" required rows="2"></textarea>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Industry</label>
-                            <InputSelect class="form-control" @bind-value="editingModel.Industry">
-                                @foreach (var ind in Enum.GetValues<Industry>())
-                                {
-                                    <option value="@ind">@ind</option>
-                                }
-                            </InputSelect>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Package</label>
-                            <InputSelect class="form-control" @bind-value="editingModel.Package">
-                                @foreach (var pkg in Enum.GetValues<PackageType>())
-                                {
-                                    <option value="@pkg">@pkg</option>
-                                }
-                            </InputSelect>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Tech Stack Tags</label>
-                        <input type="text" class="form-control" @bind-value="editingModel.TechStack" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Live URL</label>
-                        <input type="url" class="form-control" @bind-value="editingModel.LiveUrl" required />
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Image Path</label>
-                            <input type="text" class="form-control" @bind-value="editingModel.ImagePath" required />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Image Alt</label>
-                            <input type="text" class="form-control" @bind-value="editingModel.ImageAlt" required />
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Display Sorting Order</label>
-                            <input type="number" class="form-control" @bind-value="editingModel.DisplayOrder" required min="0" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-6">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="editFeatured" @bind="editingModel.Featured">
-                                <label class="form-check-label text-white" for="editFeatured">⭐ Featured</label>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="editPublic" @bind="editingModel.IsPublic">
-                                <label class="form-check-label text-white" for="editPublic">🌐 Visible</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-secondary text-light w-50 py-2" @onclick="CloseEditModal">Cancel</button>
-                        <button type="submit" class="btn btn-primary w-50 py-2" disabled="@isSaving">Save Changes</button>
-                    </div>
-                </EditForm>
-            </div>
-        </div>
-    </div>
-}

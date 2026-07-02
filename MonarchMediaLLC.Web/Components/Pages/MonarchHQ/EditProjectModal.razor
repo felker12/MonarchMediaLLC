@@ -1,0 +1,113 @@
+﻿@using MonarchMediaLLC.Shared
+
+@if (IsVisible && Project is not null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content text-light" style="background: #1E1E1E; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px;">
+
+                <div class="modal-header border-secondary">
+                    <h4 class="modal-title font-weight-bold">✏️ Edit Portfolio Card</h4>
+                    <button type="button" class="btn-close btn-close-white" @onclick="Cancel" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <EditForm Model="Project" OnValidSubmit="Save">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger mb-3" />
+
+                        @* ============== Basic Info ============== *@
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white-50 small">Project Title</label>
+                                <InputText class="form-control" @bind-Value="Project.Title" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white-50 small">Client Name</label>
+                                <InputText class="form-control" @bind-Value="Project.ClientName" />
+                            </div>
+                        </div>
+
+                        @* ============== Description ============== *@
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Description</label>
+                            <InputTextArea class="form-control" @bind-Value="Project.Description" required rows="3" />
+                        </div>
+
+                        @* ============== Classification Tiers ============== *@
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white-50 small">Industry Sector</label>
+                                <InputSelect class="form-control" @bind-Value="Project.Industry">
+                                    @foreach (var ind in Enum.GetValues<Industry>())
+                                    {
+                                        <option value="@ind">@ind</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white-50 small">Package Tier</label>
+                                <InputSelect class="form-control" @bind-Value="Project.Package">
+                                    @foreach (var pkg in Enum.GetValues<PackageType>())
+                                    {
+                                        <option value="@pkg">@pkg</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+
+                        @* ============== Technical Data & URL ============== *@
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Tech Stack Tags (Comma separated)</label>
+                            <InputText class="form-control" @bind-Value="Project.TechStack" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Launch Live URL</label>
+                            <InputText type="url" class="form-control" @bind-Value="Project.LiveUrl" required />
+                        </div>
+
+                        @* ============== Imagery Configuration ============== *@
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white-50 small">Image Asset Path</label>
+                                <InputText class="form-control" @bind-Value="Project.ImagePath" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white-50 small">Image Alt Text</label>
+                                <InputText class="form-control" @bind-Value="Project.ImageAlt" required />
+                            </div>
+                        </div>
+
+                        @* ============== Control & Ordering Options ============== *@
+                        <div class="row align-items-center mt-2 mb-4">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-white-50 small">Display Sorting Order</label>
+                                <InputNumber class="form-control" @bind-Value="Project.DisplayOrder" min="0" required />
+                            </div>
+                            <div class="col-md-4 mb-3 text-start ps-md-4">
+                                <div class="form-check form-switch mt-4">
+                                    <InputCheckbox class="form-check-input" id="editFeatured" @bind-Value="Project.Featured" />
+                                    <label class="form-check-label text-white" for="editFeatured">⭐ Featured</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3 text-start">
+                                <div class="form-check form-switch mt-4">
+                                    <InputCheckbox class="form-check-input" id="editPublic" @bind-Value="Project.IsPublic" />
+                                    <label class="form-check-label text-white" for="editPublic">🌐 Visible</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* ============== Action Buttons ============== *@
+                        <div class="modal-footer border-secondary px-0 pb-0 pt-3 d-flex gap-2">
+                            <button type="button" class="btn btn-outline-secondary text-light px-4 py-2" @onclick="Cancel">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-4 py-2">Save Changes</button>
+                        </div>
+                    </EditForm>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}

@@ -44,6 +44,28 @@
         public bool IsPublic { get; set; } = true;
         public Industry Industry { get; set; } = Industry.General;
         public string ClientName { get; set; } = string.Empty;
+
+        public ProjectSummary(ProjectSummary other)
+        {
+            Id = other.Id;
+            Title = other.Title;
+            Description = other.Description;
+            TechStack = other.TechStack;
+            LiveUrl = other.LiveUrl;
+            ImagePath = other.ImagePath;
+            ImageAlt = other.ImageAlt;
+            Package = other.Package;
+            Featured = other.Featured;
+            DisplayOrder = other.DisplayOrder;
+            CompletedOn = other.CompletedOn;
+            IsPublic = other.IsPublic;
+            Industry = other.Industry;
+            ClientName = other.ClientName;
+        }
+
+        public ProjectSummary()
+        {
+        }
     }
 
     public class AdminLoginRequest
