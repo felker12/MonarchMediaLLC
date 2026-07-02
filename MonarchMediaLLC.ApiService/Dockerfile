@@ -2,8 +2,10 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src
 
-COPY MonarchMediaLLC.ApiService ./MonarchMediaLLC.ApiService
+# Copy the entire repository
+COPY . .
 
+# Build the API project
 WORKDIR /src/MonarchMediaLLC.ApiService
 
 RUN dotnet restore
