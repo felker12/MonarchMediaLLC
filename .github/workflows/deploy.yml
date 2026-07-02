@@ -16,11 +16,19 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Build and Deploy
+      - name: Show repository contents
+        run: |
+          pwd
+          ls -la
+          echo ""
+          echo "Repository tree:"
+          find . -maxdepth 3
+
+      - name: Build and deploy Container App
         uses: azure/container-apps-deploy-action@v1
         with:
-          appSourcePath: ./MonarchMediaLLC.ApiService
-          dockerfilePath: Dockerfile
+          appSourcePath: .
           acrName: acrsouv4otnps5h4
           containerAppName: apiservice
           resourceGroup: rg-mmllc
+          dockerfilePath: ./MonarchMediaLLC.ApiService/Dockerfile
