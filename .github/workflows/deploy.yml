@@ -2,7 +2,7 @@ name: Deploy API to Azure Container App
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
@@ -18,12 +18,15 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: List repository
+        run: ls -R    
 
       # Build the project folder, push it to ACR, and cycle the Container App revision
       - name: Build and deploy Container App
         uses: azure/container-apps-deploy-action@v1
         with:
-          appSourcePath: ${{ github.workspace }}
+          appSourcePath: ./MonarchMediaLLC.ApiService
           acrName: acrsouv4otnps5h4
           containerAppName: apiservice
           resourceGroup: rg-mmllc

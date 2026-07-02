@@ -1,0 +1,20 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY . .
+
+RUN dotnet restore MonarchMediaLLC.ApiService/MonarchMediaLLC.ApiService.csproj
+
+RUN dotnet publish MonarchMediaLLC.ApiService/MonarchMediaLLC.ApiService.csproj \
+    -c Release \
+    -o /app/publish
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "MonarchMediaLLC.ApiService.dll"]
