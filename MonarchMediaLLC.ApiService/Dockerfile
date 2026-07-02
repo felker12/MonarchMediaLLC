@@ -2,13 +2,12 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src
 
-COPY . .
+COPY MonarchMediaLLC.ApiService ./MonarchMediaLLC.ApiService
 
-RUN dotnet restore MonarchMediaLLC.ApiService.csproj
+WORKDIR /src/MonarchMediaLLC.ApiService
 
-RUN dotnet publish MonarchMediaLLC.ApiService.csproj \
-    -c Release \
-    -o /app/publish
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 
