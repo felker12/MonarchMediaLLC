@@ -38,7 +38,9 @@
         public PackageType Package { get; set; } = PackageType.Core;
         public bool Featured { get; set; } = false;
         public int DisplayOrder { get; set; } = 0;
-        public DateOnly CompletedOn { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+        //Use a deterministic default to avoid EF Core reporting pending model changes
+        //caused by a date initializer that changes daily.
+        public DateOnly CompletedOn { get; set; } = DateOnly.MinValue;
         public bool IsPublic { get; set; } = true;
         public Industry Industry { get; set; } = Industry.General;
         public string ClientName { get; set; } = string.Empty;

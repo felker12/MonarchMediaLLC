@@ -1,10 +1,5 @@
 ﻿@page "/monarch-hq/projects"
 @using MonarchMediaLLC.Shared
-@using MonarchMediaLLC.Web.Services
-@inject HttpClient Http
-@inject AdminStateProvider AdminState
-@inject NavigationManager Navigation
-@inject IJSRuntime JS
 @rendermode InteractiveServer
 
 <PageTitle>HQ Projects Management</PageTitle>
@@ -13,6 +8,7 @@
     @if (AdminState.IsAuthenticated)
     {
         <div class="dashboard-wrapper animate-fade-in">
+
             <header class="dashboard-header mb-4">
                 <div>
                     <h1>Project Management Operations</h1>
@@ -28,6 +24,7 @@
             <div class="mgmt-card max-width-md mb-5">
                 <h3>Deploy New Project Card</h3>
                 <EditForm Model="@projectModel" OnValidSubmit="SubmitProject" FormName="AddProjectForm">
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Project Title</label>
@@ -137,24 +134,47 @@
                         <div class="mgmt-card d-flex flex-column justify-content-between">
                             <div>
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <div class="d-flex gap-1.5 align-items-center">
-                                        <span class="badge bg-dark border border-secondary text-light">ID: @project.Id</span>
-                                        @if (project.Featured)
-                                        {
-                                            <span class="badge bg-warning text-dark">Featured</span>
-                                        }
-                                        @if (!project.IsPublic)
-                                        {
-                                            <span class="badge bg-danger text-light">Hidden</span>
-                                        }
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-dark border border-secondary text-light">
+                                            ID: @project.Id
+                                        </span>
+                                        <span class="badge bg-secondary border border-dark text-light ms-2">
+                                            Order: @project.DisplayOrder
+                                        </span>
                                     </div>
+
                                     <button class="btn btn-sm btn-link text-gradient p-0 font-weight-bold text-decoration-none"
                                             @onclick="() => OpenEditModal(project)">
                                         ✏️ Edit Card
                                     </button>
                                 </div>
+
+                                @if (project.Featured || !project.IsPublic)
+                                {
+                                    <div class="mb-2">
+                                        @if (project.Featured)
+                                        {
+                                            <span class="badge border font-weight-bold px-2.5 py-1.5"
+                                                  style="background: rgba(155, 93, 229, 0.15); border-color: rgba(155, 93, 229, 0.4) !important;">
+                                                Featured
+                                            </span>
+                                        }
+                                        @if (!project.IsPublic)
+                                        {
+                                            <span class="badge border font-weight-bold px-2.5 py-1.5 @(project.Featured ? "ms-2" : "")"
+                                                  style="background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.15) !important; color: #A0A0A0;">
+                                                Hidden
+                                            </span>
+                                        }
+                                    </div>
+                                }
+
                                 <h4 class="text-white font-weight-bold mt-1 mb-1">@project.Title</h4>
-                                <div class="text-xs text-muted mb-2">Industry: <b class="text-light">@project.Industry</b> | Tier: <b class="text-light">@project.Package</b></div>
+                                <div class="text-xs mb-2 bold">
+                                    Industry: <b class="text-light">
+                                    @project.Industry</b> <span style="color:#9B5DE5">|</span> 
+                                    Tier: <b class="text-light">@project.Package</b>
+                                </div>
                                 <p class="text-muted text-sm mb-3">@project.Description</p>
 
                                 <div class="tech-stack-wrapper mb-3 text-gradient font-weight-bold text-sm">
@@ -188,12 +208,15 @@
 {
     <div class="custom-modal-backdrop animate-fade-in" @onclick="CloseEditModal">
         <div class="custom-modal-content" @onclick:stopPropagation style="max-width:650px;">
+
             <div class="custom-modal-header">
                 <h3>Update Portfolio Card (ID: @editingId)</h3>
                 <button type="button" class="btn-close-modal" @onclick="CloseEditModal">&times;</button>
             </div>
+
             <div class="custom-modal-body">
                 <EditForm Model="@editingModel" OnValidSubmit="UpdateProject" FormName="UpdateProjectForm">
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Title</label>
@@ -250,12 +273,12 @@
                             <label class="form-label">Image Alt</label>
                             <input type="text" class="form-control" @bind-value="editingModel.ImageAlt" required />
                         </div>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Display Sorting Order</label>
-                                <input type="number" class="form-control" @bind-value="editingModel.DisplayOrder" required min="0" />
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Display Sorting Order</label>
+                            <input type="number" class="form-control" @bind-value="editingModel.DisplayOrder" required min="0" />
                         </div>
                     </div>
 
@@ -282,164 +305,4 @@
             </div>
         </div>
     </div>
-}
-
-@code {
-    private ProjectSummary projectModel = new();
-    private List<ProjectSummary>? existingProjects;
-    private string statusMessage = string.Empty;
-    private bool isSaving = false;
-    private bool isLoadingProjects = true;
-
-    private bool isModalOpen = false;
-    private int editingId;
-    private ProjectSummary? editingModel;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            if (!AdminState.IsAuthenticated)
-            {
-                Navigation.NavigateTo("/monarch-hq");
-                return;
-            }
-            await LoadProjects();
-            StateHasChanged();
-        }
-    }
-
-    private async Task LoadProjects()
-    {
-        isLoadingProjects = true;
-        try
-        {
-            existingProjects = await Http.GetFromJsonAsync<List<ProjectSummary>>("http://apiservice/api/projects");
-        }
-        catch (Exception)
-        {
-            statusMessage = "Warning: Failed to fetch data records from backend service.";
-        }
-        finally
-        {
-            isLoadingProjects = false;
-        }
-    }
-
-    private async Task SubmitProject()
-    {
-        isSaving = true;
-        statusMessage = string.Empty;
-        try
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Post, "http://apiservice/api/projects");
-            request.Headers.Add("X-Admin-Token", AdminState.Token);
-            request.Content = JsonContent.Create(projectModel);
-
-            var response = await Http.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                statusMessage = $"Successfully deployed project '{projectModel.Title}'.";
-                projectModel = new();
-                await LoadProjects();
-            }
-        }
-        catch (Exception)
-        {
-            statusMessage = "Error updating backend records.";
-        }
-        finally
-        {
-            isSaving = false;
-        }
-    }
-
-    private void OpenEditModal(ProjectSummary target)
-    {
-        editingId = target.Id;
-        editingModel = new ProjectSummary
-        {
-            Id = target.Id,
-            Title = target.Title,
-            ClientName = target.ClientName,
-            Description = target.Description,
-            TechStack = target.TechStack,
-            LiveUrl = target.LiveUrl,
-            ImagePath = target.ImagePath,
-            ImageAlt = target.ImageAlt,
-            Industry = target.Industry,
-            Package = target.Package,
-            Featured = target.Featured,
-            IsPublic = target.IsPublic,
-            DisplayOrder = target.DisplayOrder
-        };
-        isModalOpen = true;
-    }
-
-    private void CloseEditModal()
-    {
-        isModalOpen = false;
-        editingModel = null;
-    }
-
-    private async Task UpdateProject()
-    {
-        if (editingModel == null) return;
-        isSaving = true;
-        statusMessage = string.Empty;
-        try
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Put, $"http://apiservice/api/projects/{editingId}");
-            request.Headers.Add("X-Admin-Token", AdminState.Token);
-            request.Content = JsonContent.Create(editingModel);
-
-            var response = await Http.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                statusMessage = $"Successfully updated '{editingModel.Title}'.";
-                CloseEditModal();
-                await LoadProjects();
-            }
-        }
-        catch (Exception)
-        {
-            statusMessage = "Error pushing updates to server.";
-        }
-        finally
-        {
-            isSaving = false;
-        }
-    }
-
-    private async Task DeleteProject(int id, string title)
-    {
-        statusMessage = string.Empty;
-        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Permanently wipe out '{title}'?");
-        if (!confirmed) return;
-
-        try
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Delete, $"http://apiservice/api/projects/{id}");
-            request.Headers.Add("X-Admin-Token", AdminState.Token);
-
-            var response = await Http.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                statusMessage = $"Successfully dropped '{title}'.";
-                await LoadProjects();
-            }
-        }
-        catch (Exception)
-        {
-            statusMessage = "Network error dropping target item row.";
-        }
-    }
-
-    private string FormatTechStack(string? rawTechStack)
-    {
-        if (string.IsNullOrWhiteSpace(rawTechStack)) return string.Empty;
-        var delimiters = new[] { ',', ';', '•' };
-        var parsedTags = rawTechStack.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Select(tag => tag.Trim()).Where(tag => !string.IsNullOrEmpty(tag));
-        return string.Join(" • ", parsedTags);
-    }
 }
