@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+.github
+
+# Visual Studio / Rider
+.vs/
+.vscode/
+.idea/
+
+# Build output
+**/bin/
+**/obj/
+
+# User files
+**/*.user
+**/*.suo
+**/*.userosscache
+
+# Logs
+**/*.log
+
+# Node
+**/node_modules/
+**/npm-debug.log
+
+# SQLite database files
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# Temporary files
+**/tmp/
+**/temp/
+**/*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+
+# Aspire local config
+aspire.config.json
